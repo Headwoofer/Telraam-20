@@ -10,6 +10,7 @@ body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f7f7f4;color:#1
 .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
 .sumrow{display:grid;grid-template-columns:1fr auto 1fr auto;gap:10px;align-items:end;margin-bottom:18px}
 label{font-size:14px;font-weight:700;display:flex;flex-direction:column;gap:6px}
+#first,#second{font-size:28px;font-weight:800;min-height:58px}
 input,button{font:inherit;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid #cfcfc8;background:#fff;color:#1f2937}
 button{cursor:pointer}
 .operator{font-size:28px;font-weight:700;padding-bottom:7px}
@@ -110,10 +111,7 @@ let estimateResult=null;
 function roundForEstimate(n){
   if(n<10) return n;
   const digits=String(Math.floor(n)).length;
-
-  // Schat nauwkeuriger door ongeveer de eerste twee cijfers te behouden:
-  // 14.099 -> 14.000, 3.456 -> 3.500, 687 -> 690, 84 -> 80.
-  const unit=Math.pow(10,Math.max(1,digits-2));
+  const unit=Math.pow(10,Math.max(1,digits-1));
   return Math.round(n/unit)*unit;
 }
 function updateEstimate(){
@@ -154,7 +152,7 @@ function render(){
       const b=document.createElement('button');
       b.type='button'; b.className='bead active';
       b.style.background=n<10?colors[col][0]:colors[col][1];
-      b.addEventListener('click',()=>{values[5-col]=n+1;steps=[];stepIndex=-1;render();});
+      b.addEventListener('click',()=>{values[5-col]=n;steps=[];stepIndex=-1;render();});
       bottom.appendChild(b);
     }
     rod.append(top,spacer,bottom);
