@@ -110,7 +110,10 @@ let estimateResult=null;
 function roundForEstimate(n){
   if(n<10) return n;
   const digits=String(Math.floor(n)).length;
-  const unit=Math.pow(10,Math.max(1,digits-1));
+
+  // Schat nauwkeuriger door ongeveer de eerste twee cijfers te behouden:
+  // 14.099 -> 14.000, 3.456 -> 3.500, 687 -> 690, 84 -> 80.
+  const unit=Math.pow(10,Math.max(1,digits-2));
   return Math.round(n/unit)*unit;
 }
 function updateEstimate(){
