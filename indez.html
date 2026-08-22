@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interactief verticaal telraam</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f7f7f4;color:#1f2937}
+#app{max-width:1100px;margin:0 auto;padding:24px}
+.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
+.sumrow{display:grid;grid-template-columns:1fr auto 1fr auto;gap:10px;align-items:end;margin-bottom:18px}
+label{font-size:14px;font-weight:700;display:flex;flex-direction:column;gap:6px}
+input,button{font:inherit;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid #cfcfc8;background:#fff;color:#1f2937}
+button{cursor:pointer}
+.operator{font-size:28px;font-weight:700;padding-bottom:7px}
+.valuebox{font-size:28px;font-weight:700;margin-left:auto}
+.board{background:#f2c66d;border:14px solid #8b572a;border-radius:18px;padding:18px;overflow-x:auto;box-shadow:inset 0 0 0 3px #5d351a}
+.headings,.columns{display:grid;grid-template-columns:repeat(6,minmax(88px,1fr));gap:14px;min-width:620px}
+.headings{margin-bottom:8px}
+.heading{font-weight:900;font-size:22px;text-align:center;color:#3d2516;line-height:30px}
+.col{display:flex;flex-direction:column;align-items:center;gap:9px}
+.rod{position:relative;height:520px;width:86px;display:flex;flex-direction:column;align-items:center;padding:10px 0}
+.rod::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:5px;transform:translateX(-50%);background:linear-gradient(#a9adb1,#70757a,#a9adb1);border-radius:3px;z-index:0}
+.group{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.spacer{flex:1 1 auto;min-height:16px}
+.bead{appearance:none;-webkit-appearance:none;width:68px;height:18px;min-height:18px;padding:0;border-radius:9px;border:2px solid rgba(70,45,25,.55);box-shadow:inset 0 -3px 0 rgba(0,0,0,.14);cursor:pointer;position:relative}
+.bead::after{content:"";position:absolute;width:7px;top:-2px;bottom:-2px;left:50%;transform:translateX(-50%);background:transparent;border-left:0;border-right:0}
+.bead.inactive{opacity:.35}.bead.active{opacity:1;z-index:5}
+.count{margin-top:8px;font-size:22px;font-weight:900}
+.explain{margin-top:14px;padding:14px 16px;border-radius:12px;background:#fff;border:1px solid #d8d5cc;line-height:1.5}
+.legend{margin-top:14px;padding:10px 14px;border-radius:10px;background:#fff7df;border:1px solid #d8b66b;text-align:center;font-size:14px;font-weight:700;color:#3d2516;line-height:1.5}
+.estimate{margin-top:14px;padding:14px;border-radius:12px;background:#e6f5ff;border:1px solid #9bc9e8}
+.estimate-title{font-weight:800;margin-bottom:8px}
+.estimate-row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.estimate-sum{font-size:22px;font-weight:800;min-width:180px;padding-bottom:8px}
+.estimate input{font:inherit;min-height:44px;padding:10px 12px;border-radius:10px;border:2px solid #9bc9e8;background:#fff;color:#1f2937;width:150px}
+.estimate input.correct{border-color:#2e7d32;background:#e8f5e9}
+.estimate input.wrong{border-color:#c62828;background:#ffebee}
+.estimate-feedback{font-size:14px;font-weight:700;min-height:20px;margin-top:8px}
+.help{margin-top:16px;font-size:14px;color:#5f5f59;line-height:1.5}
+@media(max-width:650px){#app{padding:16px}.sumrow{grid-template-columns:1fr auto 1fr}.sumrow button{grid-column:1/-1}.valuebox{width:100%;margin-left:0}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="controls">
+    <button id="reset" type="button">Reset</button>
+    <button id="random" type="button">Willekeurig getal</button>
+    <div class="valuebox">Getal: <span id="total">0</span></div>
+  </div>
+
+  <form id="sumform" class="sumrow">
+    <label>Eerste getal<input id="first" inputmode="numeric" value=""></label>
+    <div class="operator" id="opview">+</div>
+    <label>Tweede getal<input id="second" inputmode="numeric" value=""></label>
+    <button type="submit">Leg uit</button>
+  </form>
+
+  <div class="controls">
+    <button id="plus" type="button">Optellen</button>
+    <button id="minus" type="button">Aftrekken</button>
+    <button id="back" type="button">← Stap terug</button>
+    <button id="next" type="button">Volgende stap →</button>
+  </div>
+
+  <div class="board">
+    <div class="headings">
+      <div class="heading">HD</div><div class="heading">TD</div><div class="heading">D</div>
+      <div class="heading">H</div><div class="heading">T</div><div class="heading">E</div>
+    </div>
+    <div id="columns" class="columns"></div>
+  </div>
+
+  <div id="explain" class="explain">Klik op Leg uit voor de aftrekstappen vanaf de eenheden.</div>
+  <div class="estimate">
+    <div class="estimate-title">Schat eerst de uitkomst</div>
+    <div class="estimate-row">
+      <div id="estimateSum" class="estimate-sum">Vul eerst een som in.</div>
+      <label>Geschat antwoord
+        <input id="estimateAnswer" inputmode="numeric" aria-label="Geschat antwoord">
+      </label>
+      <button id="estimateCheck" type="button">Controle</button>
+    </div>
+    <div id="estimateFeedback" class="estimate-feedback" aria-live="polite"></div>
+  </div>
+  <div class="legend">HD = Honderdduizendtal &nbsp;|&nbsp; TD = Tienduizendtal &nbsp;|&nbsp; D = Duizendtal &nbsp;|&nbsp; H = Honderdtal &nbsp;|&nbsp; T = Tiental &nbsp;|&nbsp; E = Eenheid</div>
+  <div class="help">© Bart Vermeulen | Gemaakt met ChatGPT</div>
+</div>
+
+<script>
+const labels=['E','T','H','D','TD','HD'];
+const displayLabels=['HD','TD','D','H','T','E'];
+const colors=[
+  ['#ffd600','#fff59d'],
+  ['#ef6c00','#ffb74d'],
+  ['#7b1fa2','#ce93d8'],
+  ['#c62828','#ef9a9a'],
+  ['#1565c0','#64b5f6'],
+  ['#2e7d32','#81c784']
+];
+const placeValues=[100000,10000,1000,100,10,1];
+let values=[0,0,0,0,0,0], operator='+', steps=[], stepIndex=-1;
+
+const el=id=>document.getElementById(id);
+const columnsEl=el('columns'), totalEl=el('total'), explainEl=el('explain');
+const backBtn=el('back'), nextBtn=el('next');
+const estimateSumEl=el('estimateSum'), estimateAnswerEl=el('estimateAnswer'), estimateCheckBtn=el('estimateCheck'), estimateFeedbackEl=el('estimateFeedback');
+let estimateResult=null;
+
+function roundForEstimate(n){
+  if(n<10) return n;
+  const digits=String(Math.floor(n)).length;
+
+  // Schat nauwkeuriger door ongeveer de eerste twee cijfers te behouden:
+  // 14.099 -> 14.000, 3.456 -> 3.500, 687 -> 690, 84 -> 80.
+  const unit=Math.pow(10,Math.max(1,digits-2));
+  return Math.round(n/unit)*unit;
+}
+function updateEstimate(){
+  if(el('first').value.trim()==='' || el('second').value.trim()===''){
+    estimateSumEl.textContent='Vul eerst een som in.';
+    estimateResult=null;
+    estimateAnswerEl.classList.remove('correct','wrong');
+    estimateFeedbackEl.textContent='';
+    return;
+  }
+  const a=parseInput(el('first')), b=parseInput(el('second'));
+  const ra=roundForEstimate(a), rb=roundForEstimate(b);
+  estimateResult=operator==='+' ? ra+rb : ra-rb;
+  estimateSumEl.textContent=ra.toLocaleString('nl-NL')+' '+(operator==='+'?'+':'−')+' '+rb.toLocaleString('nl-NL')+' =';
+  estimateAnswerEl.classList.remove('correct','wrong');
+  estimateFeedbackEl.textContent='';
+}
+
+function render(){
+  columnsEl.innerHTML='';
+  for(let col=0;col<6;col++){
+    const wrap=document.createElement('div'); wrap.className='col';
+    const rod=document.createElement('div'); rod.className='rod';
+    const count=values[5-col];
+
+    const top=document.createElement('div'); top.className='group';
+    for(let n=19;n>=count;n--){
+      const b=document.createElement('button');
+      b.type='button'; b.className='bead inactive';
+      b.style.background=n<10?colors[col][0]:colors[col][1];
+      b.addEventListener('click',()=>{values[5-col]=n+1;steps=[];stepIndex=-1;render();});
+      top.appendChild(b);
+    }
+
+    const spacer=document.createElement('div'); spacer.className='spacer';
+    const bottom=document.createElement('div'); bottom.className='group';
+    for(let n=count-1;n>=0;n--){
+      const b=document.createElement('button');
+      b.type='button'; b.className='bead active';
+      b.style.background=n<10?colors[col][0]:colors[col][1];
+      b.addEventListener('click',()=>{values[5-col]=n+1;steps=[];stepIndex=-1;render();});
+      bottom.appendChild(b);
+    }
+    rod.append(top,spacer,bottom);
+
+    const c=document.createElement('div'); c.className='count'; c.textContent=count;
+    wrap.append(rod,c);
+    columnsEl.appendChild(wrap);
+  }
+  let total=0;
+  for(let p=0;p<6;p++) total+=values[p]*10**p;
+  totalEl.textContent=total.toLocaleString('nl-NL');
+}
+
+function setFromNumber(num){
+  num=Math.max(0,Math.min(999999,Math.floor(num)));
+  values=[0,0,0,0,0,0];
+  for(let p=0;p<6;p++) values[p]=Math.floor(num/10**p)%10;
+}
+
+function parseInput(input){
+  const n=Number(input.value.replace(/\./g,'').replace(/[^0-9]/g,''));
+  return Number.isFinite(n)?Math.max(0,Math.min(999999,n)):0;
+}
+
+function buildSteps(a,b){
+  const out=[{value:a,text:'We zetten eerst '+a.toLocaleString('nl-NL')+' op het telraam.'}];
+
+  if(operator==='+'){
+    const work=[0,0,0,0,0,0];
+    const addend=[0,0,0,0,0,0];
+    for(let p=0;p<6;p++){
+      work[p]=Math.floor(a/10**p)%10;
+      addend[p]=Math.floor(b/10**p)%10;
+    }
+
+    for(let place=0;place<6;place++){
+      const digit=addend[place];
+      if(!digit) continue;
+      const before=work[place];
+      const sum=before+digit;
+
+      out.push({values:[...work],text:'We beginnen bij '+labels[place]+': '+before+' + '+digit+' = '+sum+'.'});
+      work[place]=sum;
+
+      if(work[place]>=10){
+        out.push({values:[...work],text:'We hebben '+work[place]+' '+labels[place]+'. We wisselen 10 '+labels[place]+' in voor 1 '+labels[place+1]+'.'});
+        work[place]-=10;
+        work[place+1]+=1;
+        out.push({values:[...work],text:'Na het inwisselen blijven '+work[place]+' '+labels[place]+' over en komt er 1 '+labels[place+1]+' bij.'});
+      }
+    }
+
+    let current=0;
+    for(let p=0;p<6;p++) current+=work[p]*10**p;
+    out.push({values:[...work],text:'Antwoord: '+current.toLocaleString('nl-NL')+'.'});
+    return out;
+  }
+
+  const work=[0,0,0,0,0,0];
+  const sub=[0,0,0,0,0,0];
+  for(let p=0;p<6;p++){
+    work[p]=Math.floor(a/10**p)%10;
+    sub[p]=Math.floor(b/10**p)%10;
+  }
+
+  for(let place=0;place<6;place++){
+    const digit=sub[place];
+    if(!digit) continue;
+    const start=work[place];
+    out.push({values:[...work],text:'We beginnen bij '+labels[place]+': '+start+' − '+digit+'.'});
+
+    if(start<digit){
+      let donor=place+1;
+      while(donor<6 && work[donor]===0) donor++;
+      if(donor<6){
+        out.push({values:[...work],text:start+' − '+digit+' kan niet. We lenen 1 '+labels[donor]+'.'});
+        while(donor>place){
+          work[donor]-=1;
+          work[donor-1]+=10;
+          out.push({values:[...work],text:'1 '+labels[donor]+' wordt 10 '+labels[donor-1]+'.'});
+          donor--;
+        }
+        out.push({values:[...work],text:'Nu hebben we '+work[place]+' '+labels[place]+'.'});
+      }
+    }
+
+    const before=work[place];
+    work[place]-=digit;
+    out.push({values:[...work],text:before+' − '+digit+' = '+work[place]+' bij '+labels[place]+'.'});
+  }
+
+  let current=0;
+  for(let p=0;p<6;p++) current+=work[p]*10**p;
+  out.push({values:[...work],text:'Antwoord: '+current.toLocaleString('nl-NL')+'.'});
+  return out;
+}
+
+function showStep(i){
+  if(!steps.length)return;
+  stepIndex=Math.max(0,Math.min(i,steps.length-1));
+  const step=steps[stepIndex];
+  if(step.values) values=[...step.values]; else setFromNumber(step.value);
+  explainEl.textContent=step.text;
+  backBtn.disabled=stepIndex<=0;
+  nextBtn.disabled=stepIndex>=steps.length-1;
+  render();
+}
+
+el('plus').addEventListener('click',()=>{operator='+';el('opview').textContent='+';updateEstimate();});
+el('minus').addEventListener('click',()=>{operator='-';el('opview').textContent='−';updateEstimate();});
+el('reset').addEventListener('click',()=>{values=[0,0,0,0,0,0];steps=[];stepIndex=-1;explainEl.textContent='Klik op Leg uit voor de aftrekstappen vanaf de eenheden.';render();});
+el('random').addEventListener('click',()=>{values=values.map(()=>Math.floor(Math.random()*10));steps=[];stepIndex=-1;render();});
+
+el('sumform').addEventListener('submit',e=>{
+  e.preventDefault();
+  const a=parseInput(el('first')), b=parseInput(el('second'));
+  if(operator==='-'&&b>a){explainEl.textContent='Bij aftrekken moet het tweede getal kleiner of gelijk zijn aan het eerste.';return;}
+  steps=buildSteps(a,b);
+  showStep(0);
+});
+
+backBtn.addEventListener('click',()=>{if(stepIndex>0)showStep(stepIndex-1);});
+nextBtn.addEventListener('click',()=>{if(stepIndex<steps.length-1)showStep(stepIndex+1);});
+
+el('first').addEventListener('input',updateEstimate);
+el('second').addEventListener('input',updateEstimate);
+estimateCheckBtn.addEventListener('click',()=>{
+  if(estimateResult===null){estimateFeedbackEl.textContent='Vul eerst beide getallen in.';return;}
+  const entered=Number(String(estimateAnswerEl.value).replace(/\./g,'').replace(/[^0-9-]/g,''));
+  const correct=Number.isFinite(entered) && entered===estimateResult;
+  estimateAnswerEl.classList.toggle('correct',correct);
+  estimateAnswerEl.classList.toggle('wrong',!correct);
+  estimateFeedbackEl.textContent=correct?'Goed geschat!':'Nog niet. Kijk nog eens naar de afgeronde som.';
+});
+
+backBtn.disabled=true;
+nextBtn.disabled=true;
+render();
+updateEstimate();
+</script>
+</body>
+</html>
