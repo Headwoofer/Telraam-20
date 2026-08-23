@@ -6,29 +6,29 @@
 <title>Interactief verticaal telraam</title>
 <style>
 body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f7f7f4;color:#1f2937}
-#app{max-width:1100px;margin:0 auto;padding:24px}
-.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
-.sumrow{display:grid;grid-template-columns:1fr auto 1fr auto;gap:10px;align-items:end;margin-bottom:18px}
-label{font-size:14px;font-weight:700;display:flex;flex-direction:column;gap:6px}
-#first,#second{font-size:28px;font-weight:800;min-height:58px}
-input,button{font:inherit;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid #cfcfc8;background:#fff;color:#1f2937}
-button{cursor:pointer}
-.operator{font-size:28px;font-weight:700;padding-bottom:7px}
-.valuebox{font-size:28px;font-weight:700;margin-left:auto}
-.board{background:#f2c66d;border:14px solid #8b572a;border-radius:18px;padding:18px;overflow-x:auto;box-shadow:inset 0 0 0 3px #5d351a}
-.headings,.columns{display:grid;grid-template-columns:repeat(6,minmax(88px,1fr));gap:14px;min-width:620px}
+#app{max-width:1780px;margin:0 auto;padding:22px 28px}
+.controls{display:flex;gap:14px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
+.sumrow{display:grid;grid-template-columns:minmax(260px,1fr) auto minmax(260px,1fr) auto;gap:14px;align-items:end;margin-bottom:18px}
+label{font-size:18px;font-weight:800;display:flex;flex-direction:column;gap:7px}
+#first,#second{font-size:34px;font-weight:900;min-height:64px}
+input,button,select{font:inherit;min-height:52px;padding:11px 16px;border-radius:11px;border:2px solid #cfcfc8;background:#fff;color:#1f2937}
+select{font-size:20px;font-weight:800;cursor:pointer}.level-label{font-size:16px;gap:5px}
+button{cursor:pointer;font-size:20px;font-weight:800}
+.operator{font-size:38px;font-weight:900;padding-bottom:8px}
+.valuebox{font-size:34px;font-weight:900;margin-left:auto}
+.board{background:#f2c66d;border:14px solid #8b572a;border-radius:18px;padding:16px;overflow:hidden;box-shadow:inset 0 0 0 3px #5d351a;min-width:0}
+.headings,.columns{display:grid;grid-template-columns:repeat(6,minmax(82px,1fr));gap:10px;min-width:0}
 .headings{margin-bottom:8px}
-.heading{font-weight:900;font-size:22px;text-align:center;color:#3d2516;line-height:30px}
+.heading{font-weight:900;font-size:26px;text-align:center;color:#3d2516;line-height:34px}
 .col{display:flex;flex-direction:column;align-items:center;gap:9px}
-.rod{position:relative;height:520px;width:86px;display:flex;flex-direction:column;align-items:center;padding:10px 0}
+.rod{position:relative;height:455px;width:78px;display:flex;flex-direction:column;align-items:center;padding:8px 0}
 .rod::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:5px;transform:translateX(-50%);background:linear-gradient(#a9adb1,#70757a,#a9adb1);border-radius:3px;z-index:0}
 .group{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px}
 .spacer{flex:1 1 auto;min-height:16px}
-.bead{appearance:none;-webkit-appearance:none;width:68px;height:18px;min-height:18px;padding:0;border-radius:9px;border:2px solid rgba(70,45,25,.55);box-shadow:inset 0 -3px 0 rgba(0,0,0,.14);cursor:pointer;position:relative}
+.bead{appearance:none;-webkit-appearance:none;width:64px;height:17px;min-height:17px;padding:0;border-radius:9px;border:2px solid rgba(70,45,25,.65);box-shadow:inset 0 -3px 0 rgba(0,0,0,.14);cursor:pointer;position:relative}
 .bead::after{content:"";position:absolute;width:7px;top:-2px;bottom:-2px;left:50%;transform:translateX(-50%);background:transparent;border-left:0;border-right:0}
 .bead.inactive{opacity:.35}.bead.active{opacity:1;z-index:5}
-.count{margin-top:8px;font-size:22px;font-weight:900}
-.explain{margin-top:14px;padding:14px 16px;border-radius:12px;background:#fff;border:1px solid #d8d5cc;line-height:1.5}
+.count{margin-top:8px;font-size:30px;font-weight:900}
 .legend{margin-top:14px;padding:10px 14px;border-radius:10px;background:#fff7df;border:1px solid #d8b66b;text-align:center;font-size:14px;font-weight:700;color:#3d2516;line-height:1.5}
 .estimate{margin-top:14px;padding:14px;border-radius:12px;background:#e6f5ff;border:1px solid #9bc9e8}
 .estimate-title{font-weight:800;margin-bottom:8px}
@@ -39,14 +39,38 @@ button{cursor:pointer}
 .estimate input.wrong{border-color:#c62828;background:#ffebee}
 .estimate-feedback{font-size:14px;font-weight:700;min-height:20px;margin-top:8px}
 .help{margin-top:16px;font-size:14px;color:#5f5f59;line-height:1.5}
-@media(max-width:650px){#app{padding:16px}.sumrow{grid-template-columns:1fr auto 1fr}.sumrow button{grid-column:1/-1}.valuebox{width:100%;margin-left:0}}
+
+.vertical-work{padding:22px 20px;border-radius:16px;background:#fff;border:3px solid #334155;display:flex;flex-direction:column;justify-content:flex-start;min-width:0}
+.vertical-work-title{font-weight:900;margin-bottom:16px;font-size:27px;text-align:center}
+.column-sum{display:grid;grid-template-columns:52px repeat(6,minmax(48px,1fr));gap:5px;justify-content:center;align-items:center;font-family:Arial,Helvetica,sans-serif;font-variant-numeric:tabular-nums;font-size:50px;font-weight:900;width:100%;max-width:570px;margin:0 auto}
+.column-sum .cell{height:64px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.column-sum .muted{color:#9ca3af}
+.column-sum .exchange{font-size:30px;color:#9a3412;background:#ffedd5;font-weight:900}
+.column-sum .opcell{justify-content:center;padding-right:0;font-size:48px}
+.column-sum .line{border-top:6px solid #111827;border-radius:0;height:12px}
+.column-sum .resultcell{background:#eef2ff;color:#111827}
+.column-sum .activeplace{outline:5px solid #2563eb;outline-offset:-3px;background:#dbeafe}
+.column-sum .changed{background:#fef3c7}
+.work-note{margin-top:22px;text-align:center;font-size:30px;font-weight:900;color:#2563eb;min-height:82px;line-height:1.35}
+ .main-stage{display:grid;grid-template-columns:minmax(720px,1.55fr) minmax(430px,.85fr);gap:22px;align-items:stretch}
+.place-row{display:grid;grid-template-columns:52px repeat(6,minmax(48px,1fr));gap:5px;width:100%;max-width:570px;margin:0 auto 4px;font-size:17px;font-weight:900;color:#475569;text-align:center}
+.place-row span:first-child{visibility:hidden}
+@media(max-width:1200px){#app{padding:16px}.main-stage{grid-template-columns:1fr}.board{overflow-x:auto}.headings,.columns{min-width:680px}.vertical-work{max-width:760px;width:100%;box-sizing:border-box;margin:0 auto}.rod{height:430px}.column-sum{font-size:46px}}
+@media(max-width:700px){#app{padding:12px}.sumrow{grid-template-columns:1fr auto 1fr}.sumrow button{grid-column:1/-1}.valuebox{width:100%;margin-left:0}.column-sum{grid-template-columns:38px repeat(6,minmax(38px,1fr));font-size:34px}.column-sum .cell{height:48px}.column-sum .exchange{font-size:22px}.place-row{grid-template-columns:38px repeat(6,minmax(38px,1fr));font-size:13px}.vertical-work-title{font-size:22px}.work-note{font-size:24px}}
 </style>
 </head>
 <body>
 <div id="app">
   <div class="controls">
     <button id="reset" type="button">Reset</button>
-    <button id="random" type="button">Willekeurig getal</button>
+    <button id="random" type="button">Willekeurige som</button>
+    <label class="level-label">Niveau
+      <select id="level" aria-label="Niveau voor willekeurige som">
+        <option value="A">A – Groep 5</option>
+        <option value="B">B – Groep 6</option>
+        <option value="C">C – Extreem</option>
+      </select>
+    </label>
     <div class="valuebox">Getal: <span id="total">0</span></div>
   </div>
 
@@ -59,20 +83,28 @@ button{cursor:pointer}
 
   <div class="controls">
     <button id="plus" type="button">Optellen</button>
-    <button id="minus" type="button">Aftrekken</button>
+    <button id="minus" type="button">Aftellen</button>
     <button id="back" type="button">← Stap terug</button>
     <button id="next" type="button">Volgende stap →</button>
   </div>
 
-  <div class="board">
-    <div class="headings">
-      <div class="heading">HD</div><div class="heading">TD</div><div class="heading">D</div>
-      <div class="heading">H</div><div class="heading">T</div><div class="heading">E</div>
+  <div class="main-stage">
+    <div class="board">
+      <div class="headings">
+        <div class="heading">HD</div><div class="heading">TD</div><div class="heading">D</div>
+        <div class="heading">H</div><div class="heading">T</div><div class="heading">E</div>
+      </div>
+      <div id="columns" class="columns"></div>
     </div>
-    <div id="columns" class="columns"></div>
+
+    <div class="vertical-work" aria-live="polite">
+      <div class="vertical-work-title">Som onder elkaar</div>
+      <div class="place-row"><span>•</span><span>HD</span><span>TD</span><span>D</span><span>H</span><span>T</span><span>E</span></div>
+      <div id="columnSum" class="column-sum"></div>
+      <div id="workNote" class="work-note">Vul een som in en klik op Leg uit.</div>
+    </div>
   </div>
 
-  <div id="explain" class="explain">Klik op Leg uit voor de aftrekstappen vanaf de eenheden.</div>
   <div class="estimate">
     <div class="estimate-title">Schat eerst de uitkomst</div>
     <div class="estimate-row">
@@ -103,15 +135,19 @@ const placeValues=[100000,10000,1000,100,10,1];
 let values=[0,0,0,0,0,0], operator='+', steps=[], stepIndex=-1;
 
 const el=id=>document.getElementById(id);
-const columnsEl=el('columns'), totalEl=el('total'), explainEl=el('explain');
+const columnsEl=el('columns'), totalEl=el('total');
 const backBtn=el('back'), nextBtn=el('next');
 const estimateSumEl=el('estimateSum'), estimateAnswerEl=el('estimateAnswer'), estimateCheckBtn=el('estimateCheck'), estimateFeedbackEl=el('estimateFeedback');
-let estimateResult=null;
+const columnSumEl=el('columnSum'), workNoteEl=el('workNote');
+let estimateResult=null, currentA=0, currentB=0;
 
 function roundForEstimate(n){
   if(n<10) return n;
   const digits=String(Math.floor(n)).length;
-  const unit=Math.pow(10,Math.max(1,digits-1));
+  // Balans voor hoofdrekenen: kleinere getallen grof op 1 betekenisvol cijfer,
+  // grotere getallen op ongeveer 2 betekenisvolle cijfers.
+  const keepDigits=digits>=5 ? 2 : 1;
+  const unit=Math.pow(10,Math.max(0,digits-keepDigits));
   return Math.round(n/unit)*unit;
 }
 function updateEstimate(){
@@ -177,76 +213,209 @@ function parseInput(input){
   return Number.isFinite(n)?Math.max(0,Math.min(999999,n)):0;
 }
 
+
+function digitsOf(n){
+  const raw=[];
+  for(let p=5;p>=0;p--) raw.push(Math.floor(n/10**p)%10);
+  let seen=false;
+  return raw.map((d,i)=>{
+    if(d!==0 || i===5) seen=true;
+    return seen ? String(d) : '';
+  });
+}
+
+function renderColumnSum(step=null){
+  if(!columnSumEl) return;
+  columnSumEl.innerHTML='';
+  const aDigits=digitsOf(currentA), bDigits=digitsOf(currentB);
+  const active=step && Number.isInteger(step.place) ? 5-step.place : -1;
+
+  const add=(text, cls='cell')=>{const d=document.createElement('div');d.className=cls;d.textContent=text;columnSumEl.appendChild(d);};
+
+  // Werkcijfers boven de som: alleen gewijzigde cijfers door lenen/inwisselen.
+  const workDigits = step && step.workDigits ? step.workDigits : {};
+  const activePlace = active>=0 ? 5-active : null;
+  const hasActiveWorkDigit = activePlace!==null && Object.prototype.hasOwnProperty.call(workDigits,activePlace);
+  const selectionMode = step && step.selectionMode ? step.selectionMode : 'calculate';
+
+  const row=(op,digits,kind)=>{
+    add(op,'cell opcell');
+    digits.forEach((d,i)=>{
+      let shouldHighlight=false;
+      if(i===active){
+        if(operator==='+'){
+          // Bij optellen horen beide getallen én het bovenste onthoud-/inwisselvak bij de actieve kolom.
+          shouldHighlight=true;
+        }else if(selectionMode==='inspect'){
+          // Tijdens het zoeken naar een donor bekijken we alleen het cijfer van het eerste getal.
+          shouldHighlight=(kind==='a');
+        }else if(selectionMode==='exchange'){
+          // Tijdens het inwisselen markeren we de somcijfers niet; alleen het werkcijfer bovenaan krijgt nadruk.
+          shouldHighlight=false;
+        }else if(kind==='b'){
+          // Tijdens het echte aftellen doet het onderste cijfer mee.
+          shouldHighlight=true;
+        }else if(kind==='a' && !hasActiveWorkDigit){
+          // Zonder werkcijfer rekenen we middelste − onderste.
+          shouldHighlight=true;
+        }
+        // Met een werkcijfer rekenen we bovenste werkcijfer − onderste cijfer.
+      }
+      add(d, 'cell '+(shouldHighlight?'activeplace ':'')+(kind==='b'&&i===active?'changed':''));
+    });
+  };
+
+  add('','cell');
+  for(let i=0;i<6;i++){
+    const place=5-i;
+    const hasWork=Object.prototype.hasOwnProperty.call(workDigits,place);
+    const t=hasWork ? String(workDigits[place]) : '';
+    // Het bovenste vak licht alleen op als er echt een onthoud-/inwisselcijfer staat.
+    // Bij de allereerste optelstap is dat vak dus nog neutraal.
+    const highlightTop = i===active && hasWork && (operator==='+' || selectionMode!=='inspect');
+    add(t,'cell exchange '+(highlightTop?'activeplace':''));
+  }
+
+  // De oorspronkelijke som blijft staan. De kleine werkcijfers erboven tonen het lenen.
+  row('',aDigits,'a');
+  row(operator==='+'?'+':'−',bDigits,'b');
+  add('','cell'); for(let i=0;i<6;i++) add('','cell line');
+
+  // Onder de streep komen uitsluitend cijfers die al echt uitgerekend zijn.
+  add('','cell');
+  const result = step && step.result ? step.result : {};
+  for(let i=0;i<6;i++){
+    const place=5-i;
+    const d=Object.prototype.hasOwnProperty.call(result,place) ? String(result[place]) : '';
+    add(d,'cell resultcell '+(i===active?'activeplace':''));
+  }
+  workNoteEl.textContent=(step&&step.workNote) ? step.workNote : 'De kleine cijfers bovenaan laten het lenen of inwisselen zien.';
+}
+
 function buildSteps(a,b){
-  const out=[{value:a,text:'We zetten eerst '+a.toLocaleString('nl-NL')+' op het telraam.'}];
+  const out=[{value:a,place:null,workDigits:{},result:{},workNote:'We zetten eerst het eerste getal op het telraam.',text:'We zetten eerst '+a.toLocaleString('nl-NL')+' op het telraam.'}];
 
   if(operator==='+'){
     const work=[0,0,0,0,0,0];
     const addend=[0,0,0,0,0,0];
+    const result={};
     for(let p=0;p<6;p++){
       work[p]=Math.floor(a/10**p)%10;
       addend[p]=Math.floor(b/10**p)%10;
     }
+
+    // Bij optellen zijn de bovenste vakken uitsluitend voor onthouden/inwisselen.
+    // Dus: nooit de volledige kolomsom (zoals 16, 15 of 12) en nooit het
+    // resterende antwoordcijfer bovenaan tonen. Alleen de doorgeschoven 1.
+    const carryDigits={};
+    const currentCarryDigits=()=>({...carryDigits});
 
     for(let place=0;place<6;place++){
       const digit=addend[place];
       if(!digit) continue;
       const before=work[place];
       const sum=before+digit;
-
-      out.push({values:[...work],text:'We beginnen bij '+labels[place]+': '+before+' + '+digit+' = '+sum+'.'});
+      out.push({values:[...work],place,workDigits:currentCarryDigits(),result:{...result},workNote:'We rekenen in deze kolom: '+before+' + '+digit+'.',text:'We beginnen bij '+labels[place]+': '+before+' + '+digit+' = '+sum+'.'});
       work[place]=sum;
 
-      if(work[place]>=10){
-        out.push({values:[...work],text:'We hebben '+work[place]+' '+labels[place]+'. We wisselen 10 '+labels[place]+' in voor 1 '+labels[place+1]+'.'});
+      if(work[place]>=10 && place<5){
+        // Eerst expliciet de te grote hoeveelheid op het telraam tonen,
+        // terwijl boven de som alleen eerdere onthoudcijfers zichtbaar blijven.
+        out.push({values:[...work],place,workDigits:currentCarryDigits(),result:{...result},workNote:work[place]+' '+labels[place]+' is te veel voor één kolom. We wisselen 10 in.',text:'We hebben '+work[place]+' '+labels[place]+'. We wisselen 10 '+labels[place]+' in voor 1 '+labels[place+1]+'.'});
         work[place]-=10;
         work[place+1]+=1;
-        out.push({values:[...work],text:'Na het inwisselen blijven '+work[place]+' '+labels[place]+' over en komt er 1 '+labels[place+1]+' bij.'});
+        carryDigits[place+1]=1;
+        result[place]=work[place];
+        out.push({values:[...work],place,workDigits:currentCarryDigits(),result:{...result},workNote:'10 '+labels[place]+' worden 1 '+labels[place+1]+'. Het cijfer '+work[place]+' blijft in deze kolom.',text:'Na het inwisselen blijven '+work[place]+' '+labels[place]+' over en komt er 1 '+labels[place+1]+' bij.'});
+      } else {
+        result[place]=work[place];
+        out.push({values:[...work],place,workDigits:currentCarryDigits(),result:{...result},workNote:before+' + '+digit+' = '+work[place]+'. Dit cijfer schrijven we onder de streep.',text:before+' + '+digit+' = '+work[place]+' bij '+labels[place]+'.'});
       }
     }
 
     let current=0;
     for(let p=0;p<6;p++) current+=work[p]*10**p;
-    out.push({values:[...work],text:'Antwoord: '+current.toLocaleString('nl-NL')+'.'});
+    for(let p=0;p<6;p++) if(work[p]!==0 || p===0) result[p]=work[p];
+    out.push({values:[...work],place:null,workDigits:{},result:{...result},workNote:'Dit is de uitkomst.',text:'Antwoord: '+current.toLocaleString('nl-NL')+'.'});
     return out;
   }
 
   const work=[0,0,0,0,0,0];
+  const original=[0,0,0,0,0,0];
   const sub=[0,0,0,0,0,0];
+  const result={};
   for(let p=0;p<6;p++){
     work[p]=Math.floor(a/10**p)%10;
+    original[p]=work[p];
     sub[p]=Math.floor(b/10**p)%10;
   }
 
+  // De bovenste vakken zijn uitsluitend voor leen-/inwisselnotatie.
+  // Ze veranderen dus alleen wanneer er daadwerkelijk geleend wordt,
+  // niet wanneer daarna de aftrekking in die kolom wordt uitgevoerd.
+  let borrowDigits={};
+  const currentBorrowDigits=()=>({...borrowDigits});
+  // De bovenste vakken bewaren uitsluitend de leen-/inwisselnotatie.
+  // Uitkomsten van de aftrekking mogen deze vakken nooit overschrijven.
+  const recordExchange=(fromPlace,toPlace)=>{
+    borrowDigits[fromPlace]=work[fromPlace];
+    borrowDigits[toPlace]=work[toPlace];
+  };
+
   for(let place=0;place<6;place++){
     const digit=sub[place];
-    if(!digit) continue;
+    if(!digit && place>0 && !Object.keys(result).length) continue;
+    if(!digit && work[place]===0) continue;
     const start=work[place];
-    out.push({values:[...work],text:'We beginnen bij '+labels[place]+': '+start+' − '+digit+'.'});
+    out.push({values:[...work],place,workDigits:currentBorrowDigits(),result:{...result},workNote:'We kijken naar '+labels[place]+': '+start+' − '+digit+'.',text:'We beginnen bij '+labels[place]+': '+start+' − '+digit+'.'});
 
     if(start<digit){
       let donor=place+1;
       while(donor<6 && work[donor]===0) donor++;
       if(donor<6){
-        out.push({values:[...work],text:start+' − '+digit+' kan niet. We lenen 1 '+labels[donor]+'.'});
+        // Laat bij lege tussenkolommen eerst expliciet zien waarom we verder naar links moeten.
+        // Voorbeeld 203 − 89 bij E: T is 0, dus eerst tonen dat we naar H moeten kijken,
+        // vóórdat H daadwerkelijk wordt ingewisseld voor 10 T.
+        if(donor>place+1){
+          const emptyPlaces=[];
+          for(let p=place+1;p<donor;p++) emptyPlaces.push(labels[p]);
+          const emptyText=emptyPlaces.map(p=>p+' staat op 0').join(' en ');
+          out.push({
+            values:[...work],
+            place:place+1,
+            selectionMode:'inspect',
+            workDigits:currentBorrowDigits(),
+            result:{...result},
+            workNote:start+' − '+digit+' kan niet. '+emptyText+', dus daar kunnen we niet lenen. We kijken één kolom verder naar links: '+labels[donor]+'.',
+            text:start+' − '+digit+' kan niet. '+emptyText+', dus we gaan verder naar links naar '+labels[donor]+'.'
+          });
+        } else {
+          out.push({values:[...work],place:donor,selectionMode:'inspect',workDigits:currentBorrowDigits(),result:{...result},workNote:start+' − '+digit+' kan niet. We lenen 1 '+labels[donor]+'.',text:start+' − '+digit+' kan niet. We lenen 1 '+labels[donor]+'.'});
+        }
         while(donor>place){
           work[donor]-=1;
           work[donor-1]+=10;
-          out.push({values:[...work],text:'1 '+labels[donor]+' wordt 10 '+labels[donor-1]+'.'});
+          recordExchange(donor,donor-1);
+          out.push({values:[...work],place:donor-1,selectionMode:'exchange',workDigits:currentBorrowDigits(),result:{...result},workNote:'1 '+labels[donor]+' wordt 10 '+labels[donor-1]+'.',text:'1 '+labels[donor]+' wordt 10 '+labels[donor-1]+'.'});
           donor--;
         }
-        out.push({values:[...work],text:'Nu hebben we '+work[place]+' '+labels[place]+'.'});
+        out.push({values:[...work],place,workDigits:currentBorrowDigits(),result:{...result},workNote:'Nu staat er '+work[place]+' bij '+labels[place]+'. Nu kunnen we aftellen.',text:'Nu hebben we '+work[place]+' '+labels[place]+'.'});
       }
     }
 
     const before=work[place];
     work[place]-=digit;
-    out.push({values:[...work],text:before+' − '+digit+' = '+work[place]+' bij '+labels[place]+'.'});
+    result[place]=work[place];
+    out.push({values:[...work],place,workDigits:currentBorrowDigits(),result:{...result},workNote:before+' − '+digit+' = '+work[place]+'. We schrijven '+work[place]+' onder de streep.',text:before+' − '+digit+' = '+work[place]+' bij '+labels[place]+'.'});
   }
 
+  // Zet ook onbewerkte hogere plaatsen in het eindantwoord.
   let current=0;
-  for(let p=0;p<6;p++) current+=work[p]*10**p;
-  out.push({values:[...work],text:'Antwoord: '+current.toLocaleString('nl-NL')+'.'});
+  for(let p=0;p<6;p++){
+    current+=work[p]*10**p;
+    if(work[p]!==0 || p===0) result[p]=work[p];
+  }
+  out.push({values:[...work],place:null,workDigits:currentBorrowDigits(),result:{...result},workNote:'Dit is de uitkomst.',text:'Antwoord: '+current.toLocaleString('nl-NL')+'.'});
   return out;
 }
 
@@ -255,21 +424,62 @@ function showStep(i){
   stepIndex=Math.max(0,Math.min(i,steps.length-1));
   const step=steps[stepIndex];
   if(step.values) values=[...step.values]; else setFromNumber(step.value);
-  explainEl.textContent=step.text;
   backBtn.disabled=stepIndex<=0;
   nextBtn.disabled=stepIndex>=steps.length-1;
   render();
+  renderColumnSum(step);
 }
 
-el('plus').addEventListener('click',()=>{operator='+';el('opview').textContent='+';updateEstimate();});
-el('minus').addEventListener('click',()=>{operator='-';el('opview').textContent='−';updateEstimate();});
-el('reset').addEventListener('click',()=>{values=[0,0,0,0,0,0];steps=[];stepIndex=-1;explainEl.textContent='Klik op Leg uit voor de aftrekstappen vanaf de eenheden.';render();});
-el('random').addEventListener('click',()=>{values=values.map(()=>Math.floor(Math.random()*10));steps=[];stepIndex=-1;render();});
+el('plus').addEventListener('click',()=>{operator='+';el('opview').textContent='+';updateEstimate();renderColumnSum(steps[stepIndex]||null);});
+el('minus').addEventListener('click',()=>{operator='-';el('opview').textContent='−';updateEstimate();renderColumnSum(steps[stepIndex]||null);});
+el('reset').addEventListener('click',()=>{values=[0,0,0,0,0,0];steps=[];stepIndex=-1;currentA=0;currentB=0;render();renderColumnSum();});
+function randomInt(min,max){
+  min=Math.ceil(min); max=Math.floor(max);
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+function levelSettings(){
+  const level=el('level').value;
+  if(level==='A') return {minA:100,max:999,minB:10};         // Groep 5: rekenen tot 1.000
+  if(level==='B') return {minA:1000,max:9999,minB:100};     // Groep 6: rekenen tot 10.000
+  return {minA:10000,max:999999,minB:1000};                 // Extreem: volledige 6-cijferige ruimte
+}
+
+function makeRandomSum(){
+  const cfg=levelSettings();
+  let a,b;
+  if(operator==='+'){
+    // Houd genoeg ruimte over zodat de uitkomst binnen het telraam blijft.
+    a=randomInt(cfg.minA,Math.max(cfg.minA,Math.floor(cfg.max*0.78)));
+    const maxB=Math.max(cfg.minB,Math.min(cfg.max-a,Math.floor(cfg.max*0.45)));
+    b=randomInt(cfg.minB,maxB);
+  }else{
+    a=randomInt(Math.max(cfg.minA,cfg.minB+1),cfg.max);
+    // Bij aftellen is het tweede getal altijd kleiner dan het eerste.
+    b=randomInt(cfg.minB,Math.max(cfg.minB,a-1));
+  }
+
+  el('first').value=String(a);
+  el('second').value=String(b);
+  currentA=a; currentB=b;
+  steps=[]; stepIndex=-1;
+  setFromNumber(a);
+  backBtn.disabled=true; nextBtn.disabled=true;
+  render();
+  renderColumnSum();
+  updateEstimate();
+  estimateAnswerEl.value='';
+  estimateAnswerEl.classList.remove('correct','wrong');
+  estimateFeedbackEl.textContent='';
+}
+
+el('random').addEventListener('click',makeRandomSum);
 
 el('sumform').addEventListener('submit',e=>{
   e.preventDefault();
   const a=parseInput(el('first')), b=parseInput(el('second'));
-  if(operator==='-'&&b>a){explainEl.textContent='Bij aftrekken moet het tweede getal kleiner of gelijk zijn aan het eerste.';return;}
+  currentA=a; currentB=b;
+  if(operator==='-'&&b>a){workNoteEl.textContent='Bij aftellen moet het tweede getal kleiner of gelijk zijn aan het eerste.';return;}
   steps=buildSteps(a,b);
   showStep(0);
 });
@@ -291,6 +501,7 @@ estimateCheckBtn.addEventListener('click',()=>{
 backBtn.disabled=true;
 nextBtn.disabled=true;
 render();
+renderColumnSum();
 updateEstimate();
 </script>
 </body>
