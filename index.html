@@ -142,6 +142,223 @@ button:active{transform:translateY(1px)}
   #app{padding:12px}.valuebox{font-size:21px}.work-note{font-size:23px}.estimate-row label{flex-direction:column;align-items:flex-start}
 }
 
+
+/* === Interactieve oefenmodus voor de som onder elkaar === */
+#practiceToggle.practice-on{
+  background:#0f766e;
+  border-color:#0f766e;
+  color:#fff;
+}
+.column-sum .practice-cell{
+  background:#ecfeff;
+  outline:4px solid #0f766e;
+  outline-offset:-2px;
+}
+.column-sum .exchange .practice-input,
+.column-sum .resultcell .practice-input{
+  cursor:text;
+}
+.column-sum .exchange:has(.practice-input),
+.column-sum .resultcell:has(.practice-input){
+  background:#f8fafc;
+  outline:1px dashed #94a3b8;
+  outline-offset:-3px;
+}
+.practice-input{
+  width:72%;
+  min-width:38px;
+  max-width:72px;
+  height:48px;
+  min-height:48px;
+  padding:2px 6px;
+  box-sizing:border-box;
+  border:3px solid #0f766e;
+  border-radius:8px;
+  background:#fff;
+  color:#111827;
+  font:inherit;
+  font-size:.78em;
+  font-weight:900;
+  text-align:center;
+  box-shadow:0 0 0 4px rgba(15,118,110,.10);
+}
+.practice-input:focus{
+  outline:3px solid rgba(15,118,110,.24);
+  outline-offset:2px;
+}
+.practice-input.practice-wrong{
+  border-color:#c62828;
+  background:#ffebee;
+}
+.practice-input.practice-correct{
+  border-color:#2e7d32;
+  background:#e8f5e9;
+}
+.vertical-work.practice-mode{
+  border-color:#76b7b1;
+  box-shadow:0 2px 6px rgba(30,41,59,.08), inset 0 0 0 2px rgba(15,118,110,.08);
+}
+.vertical-work.practice-mode .vertical-work-title::after{
+  content:" • zelf oefenen";
+  color:#0f766e;
+  font-size:.68em;
+  font-weight:800;
+}
+@media(max-width:700px){
+  .practice-input{height:40px;min-height:40px;max-width:54px}
+}
+
+
+/* V3: invoervakken altijd zichtbaar en klikbaar in Zelf oefenen */
+.vertical-work.practice-mode .column-sum .exchange,
+.vertical-work.practice-mode .column-sum .resultcell{
+  min-height:62px;
+  pointer-events:auto !important;
+}
+.vertical-work.practice-mode .practice-input{
+  display:block !important;
+  position:relative;
+  z-index:20;
+  pointer-events:auto !important;
+  cursor:text !important;
+  width:54px;
+  height:54px;
+  min-height:54px;
+  padding:0;
+  border:3px solid #0f766e;
+  background:#ffffff;
+  border-radius:9px;
+  text-align:center;
+  font-size:32px;
+  font-weight:900;
+}
+
+
+/* V4: oefenmodus rustiger en losgekoppeld van de uitlegmodus */
+.vertical-work.practice-mode .column-sum .exchange,
+.vertical-work.practice-mode .column-sum .resultcell{
+  outline:none;
+  background:transparent;
+}
+.vertical-work.practice-mode .column-sum .practice-editable{
+  background:#f8fafc;
+  outline:1px dashed #94a3b8;
+  outline-offset:-3px;
+}
+.vertical-work.practice-mode .practice-editable .practice-input{
+  display:block;
+  width:54px;
+  height:54px;
+  min-height:54px;
+  padding:0;
+  border:3px solid #0f766e;
+  border-radius:9px;
+  background:#fff;
+  text-align:center;
+  font-size:32px;
+  font-weight:900;
+  cursor:text;
+}
+.vertical-work.practice-mode .practice-editable .practice-input.practice-correct{
+  border-color:#2e7d32;
+  background:#e8f5e9;
+}
+.vertical-work.practice-mode .practice-editable .practice-input.practice-wrong{
+  border-color:#c62828;
+  background:#ffebee;
+}
+
+
+/* V5: oefenvakken worden nu door een aparte renderer opgebouwd */
+.vertical-work.practice-mode .column-sum .practice-editable{
+  min-height:62px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f8fafc !important;
+  outline:1px dashed #94a3b8 !important;
+  outline-offset:-3px;
+  pointer-events:auto !important;
+}
+.vertical-work.practice-mode .column-sum .practice-editable .practice-input{
+  display:block !important;
+  position:relative;
+  z-index:30;
+  width:54px !important;
+  height:54px !important;
+  min-height:54px !important;
+  padding:0 !important;
+  border:3px solid #0f766e !important;
+  border-radius:9px !important;
+  background:#fff !important;
+  color:#111827 !important;
+  text-align:center;
+  font-size:32px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  cursor:text !important;
+  pointer-events:auto !important;
+}
+.vertical-work.practice-mode .column-sum .practice-editable .practice-input.practice-correct{
+  border-color:#2e7d32 !important;
+  background:#e8f5e9 !important;
+}
+.vertical-work.practice-mode .column-sum .practice-editable .practice-input.practice-wrong{
+  border-color:#c62828 !important;
+  background:#ffebee !important;
+}
+
+
+/* V6: antwoordvelden zijn altijd echte HTML-invoervelden */
+.vertical-work.practice-mode .practice-input{
+  -webkit-user-select:text !important;
+  user-select:text !important;
+  touch-action:manipulation;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+
+/* V7: juiste tussenstappen bij lenen */
+.vertical-work.practice-mode .practice-input.practice-intermediate{
+  border-color:#2563eb !important;
+  background:#eaf2ff !important;
+}
+
+
+/* V8: tijdens het typen geen foutkleur; feedback pas na een afgeronde invoer */
+.vertical-work.practice-mode .practice-input:focus{
+  border-color:#0f766e !important;
+  background:#ffffff !important;
+}
+
+
+/* V9: in oefenmodus worden vervangen cijfers bij lenen direct doorgestreept */
+.vertical-work.practice-mode .column-sum .borrow-replaced{
+  text-decoration-line:line-through !important;
+  text-decoration-thickness:7px !important;
+  text-decoration-color:#ff0000 !important;
+  text-decoration-skip-ink:none !important;
+}
+
+
+/* V15: duidelijke eindbevestiging wanneer de oefensom volledig klopt */
+.vertical-work .work-note.practice-success{
+  color:#166534 !important;
+  background:#ecfdf3;
+  border:2px solid #86efac;
+  border-radius:12px;
+  padding:12px 14px;
+}
+
+
+/* V18: in Zelf oefenen verschijnt uitleg alleen op verzoek */
+.vertical-work.practice-mode .work-note:empty{
+  min-height:0;
+  margin-top:8px;
+  padding:0;
+}
+
 </style>
 </head>
 <body>
@@ -149,6 +366,7 @@ button:active{transform:translateY(1px)}
   <div class="controls">
     <button id="reset" type="button">Reset</button>
     <button id="random" type="button">Willekeurige som</button>
+    <button id="practiceToggle" type="button" aria-pressed="false">Modus: Uitleg</button>
     <label class="level-label">Niveau
       <select id="level" aria-label="Niveau voor willekeurige som">
         <option value="A">A – Groep 5</option>
@@ -202,7 +420,17 @@ button:active{transform:translateY(1px)}
     <div id="estimateFeedback" class="estimate-feedback" aria-live="polite"></div>
   </div>
   <div class="legend">HD = Honderdduizendtal &nbsp;|&nbsp; TD = Tienduizendtal &nbsp;|&nbsp; D = Duizendtal &nbsp;|&nbsp; H = Honderdtal &nbsp;|&nbsp; T = Tiental &nbsp;|&nbsp; E = Eenheid</div>
-  <div class="help">© Bart Vermeulen | Gemaakt met ChatGPT</div>
+  <div class="help">
+  © Bart Vermeulen | Gemaakt met ChatGPT
+  &nbsp;|&nbsp;
+  <a href="https://hits.sh/headwoofer.github.io/Telraam-20/" target="_blank" rel="noopener noreferrer" aria-label="Bekijk bezoekstatistieken">
+    <img
+      src="https://hits.sh/headwoofer.github.io/Telraam-20.svg?label=bezoeken&view=total"
+      alt="Aantal bezoeken"
+      style="vertical-align:middle;height:20px;border:0"
+    >
+  </a>
+</div>
 </div>
 
 <script>
@@ -225,6 +453,13 @@ const backBtn=el('back'), nextBtn=el('next');
 const estimateSumEl=el('estimateSum'), estimateAnswerEl=el('estimateAnswer'), estimateCheckBtn=el('estimateCheck'), estimateFeedbackEl=el('estimateFeedback');
 const columnSumEl=el('columnSum'), workNoteEl=el('workNote');
 let estimateResult=null, currentA=0, currentB=0;
+
+let practiceMode=false;
+let practiceEntries={work:{},result:{}};
+let practiceExpected={work:{},result:{}};
+let practiceActions=[];
+let practiceHelpIndex=-1;
+let practiceHelpVisible=false;
 
 function roundForEstimate(n){
   if(n<10) return n;
@@ -414,7 +649,7 @@ function buildSteps(a,b){
       if(work[place]>=10 && place<5){
         // Eerst expliciet de te grote hoeveelheid op het telraam tonen,
         // terwijl boven de som alleen eerdere onthoudcijfers zichtbaar blijven.
-        out.push({values:[...work],place,workDigits:currentCarryDigits(),result:{...result},workNote:work[place]+' '+labels[place]+' is te veel voor één kolom. We wisselen 10 in.',text:'We hebben '+work[place]+' '+labels[place]+'. We wisselen 10 '+labels[place]+' in voor 1 '+labels[place+1]+'.'});
+        out.push({values:[...work],place,workDigits:currentCarryDigits(),result:{...result},workNote:work[place]+' '+labels[place]+' is te veel voor één kolom. Ik wissel 10 in.',text:'We hebben '+work[place]+' '+labels[place]+'. Ik wissel 10 '+labels[place]+' in voor 1 '+labels[place+1]+'.'});
         work[place]-=10;
         work[place+1]+=1;
         carryDigits[place+1]=1;
@@ -460,7 +695,7 @@ function buildSteps(a,b){
     if(!digit && place>0 && !Object.keys(result).length) continue;
     if(!digit && work[place]===0) continue;
     const start=work[place];
-    out.push({values:[...work],place,workDigits:currentBorrowDigits(),result:{...result},workNote:'We kijken naar '+labels[place]+': '+start+' − '+digit+'.',text:'We beginnen bij '+labels[place]+': '+start+' − '+digit+'.'});
+    out.push({values:[...work],place,workDigits:currentBorrowDigits(),result:{...result},workNote:'Ik kijk naar '+labels[place]+': '+start+' − '+digit+'.',text:'We beginnen bij '+labels[place]+': '+start+' − '+digit+'.'});
 
     if(start<digit){
       let donor=place+1;
@@ -483,7 +718,7 @@ function buildSteps(a,b){
             text:start+' − '+digit+' kan niet. '+emptyText+', dus we gaan verder naar links naar '+labels[donor]+'.'
           });
         } else {
-          out.push({values:[...work],place:donor,selectionMode:'inspect',workDigits:currentBorrowDigits(),result:{...result},workNote:start+' − '+digit+' kan niet. We lenen 1 '+labels[donor]+'.',text:start+' − '+digit+' kan niet. We lenen 1 '+labels[donor]+'.'});
+          out.push({values:[...work],place:donor,selectionMode:'inspect',workDigits:currentBorrowDigits(),result:{...result},workNote:start+' − '+digit+' kan niet. Ik leen 1 '+labels[donor]+'.',text:start+' − '+digit+' kan niet. Ik leen 1 '+labels[donor]+'.'});
         }
         while(donor>place){
           work[donor]-=1;
@@ -492,14 +727,14 @@ function buildSteps(a,b){
           out.push({values:[...work],place:donor-1,selectionMode:'exchange',workDigits:currentBorrowDigits(),result:{...result},workNote:'1 '+labels[donor]+' wordt 10 '+labels[donor-1]+'.',text:'1 '+labels[donor]+' wordt 10 '+labels[donor-1]+'.'});
           donor--;
         }
-        out.push({values:[...work],place,workDigits:currentBorrowDigits(),result:{...result},workNote:'Nu staat er '+work[place]+' bij '+labels[place]+'. Nu kunnen we aftellen.',text:'Nu hebben we '+work[place]+' '+labels[place]+'.'});
+        out.push({values:[...work],place,workDigits:currentBorrowDigits(),result:{...result},workNote:'Nu staat er '+work[place]+' bij '+labels[place]+'. Nu kan ik aftellen.',text:'Nu hebben we '+work[place]+' '+labels[place]+'.'});
       }
     }
 
     const before=work[place];
     work[place]-=digit;
     result[place]=work[place];
-    out.push({values:[...work],place,workDigits:currentBorrowDigits(),result:{...result},workNote:before+' − '+digit+' = '+work[place]+'. We schrijven '+work[place]+' onder de streep.',text:before+' − '+digit+' = '+work[place]+' bij '+labels[place]+'.'});
+    out.push({values:[...work],place,workDigits:currentBorrowDigits(),result:{...result},workNote:before+' − '+digit+' = '+work[place]+'. Ik schrijf '+work[place]+' onder de streep.',text:before+' − '+digit+' = '+work[place]+' bij '+labels[place]+'.'});
   }
 
   // Zet ook onbewerkte hogere plaatsen in het eindantwoord.
@@ -512,6 +747,579 @@ function buildSteps(a,b){
   return out;
 }
 
+
+
+function buildPracticeExpected(){
+  const expected={work:{},result:{}};
+
+  if(operator==='+'){
+    let carry=0;
+    for(let place=0;place<6;place++){
+      const aDigit=digitAtPlace(currentA,place);
+      const bDigit=digitAtPlace(currentB,place);
+      const total=aDigit+bDigit+carry;
+      const resultDigit=total%10;
+      const carryOut=Math.floor(total/10);
+
+      expected.result[place]=resultDigit;
+      if(carryOut && place<5){
+        expected.work[place+1]=[carryOut];
+      }
+      carry=carryOut;
+    }
+    return expected;
+  }
+
+  // Bij aftellen bewaren we per werkvak alle geldige opeenvolgende leenstanden.
+  for(const step of steps){
+    const wd=step.workDigits||{};
+    for(const [place,value] of Object.entries(wd)){
+      const p=Number(place);
+      if(!expected.work[p]) expected.work[p]=[];
+      const n=Number(value);
+      if(expected.work[p][expected.work[p].length-1]!==n){
+        expected.work[p].push(n);
+      }
+    }
+  }
+
+  const finalStep=steps[steps.length-1]||{};
+  const result=finalStep.result||{};
+  for(const [place,value] of Object.entries(result)){
+    expected.result[Number(place)]=Number(value);
+  }
+
+  return expected;
+}
+
+function placePlural(place){
+  return ['eenheden','tientallen','honderdtallen','duizendtallen','tienduizendtallen','honderdduizendtallen'][place] || labels[place];
+}
+
+function digitAtPlace(n,place){
+  return Math.floor(n/10**place)%10;
+}
+
+function buildPracticeActions(){
+  if(operator==='+'){
+    const actions=[];
+    const workValues=[0,0,0,0,0,0];
+    for(let p=0;p<6;p++) workValues[p]=digitAtPlace(currentA,p);
+
+    let carry=0;
+    for(let place=0;place<6;place++){
+      const aDigit=digitAtPlace(currentA,place);
+      const bDigit=digitAtPlace(currentB,place);
+      const carryIn=carry;
+      const total=aDigit+bDigit+carryIn;
+      const resultDigit=total%10;
+      const carryOut=Math.floor(total/10);
+
+      const targets=[{kind:'result',place,expected:resultDigit}];
+
+      if(carryOut && place<5){
+        targets.push({kind:'work',place:place+1,expected:carryOut});
+      }
+
+      // Telraamstand na deze volledige kolomstap:
+      // eerst de uitkomst in de huidige kolom, en de carry meteen door naar links.
+      workValues[place]=resultDigit;
+      if(place<5){
+        workValues[place+1]=aDigitAtWorkPlace(place+1, workValues, currentA);
+        if(carryOut) workValues[place+1]+=carryOut;
+      }
+
+      let calc='';
+      if(carryIn){
+        calc=aDigit+' + '+bDigit+' + '+carryIn+' = '+total+'. ';
+      }else{
+        calc=aDigit+' + '+bDigit+' = '+total+'. ';
+      }
+
+      let message=calc+'Ik schrijf '+resultDigit+' bij '+labels[place]+'.';
+      if(carryOut && place<5){
+        message+=' Ik onthoud '+carryOut+' bij '+labels[place+1]+'.';
+      }
+
+      actions.push({
+        targets,
+        message,
+        stepIndex:place,
+        step:{
+          values:[...workValues],
+          place,
+          workNote:message
+        },
+        kind:'column'
+      });
+
+      carry=carryOut;
+
+      // Stop zodra alle relevante hogere cijfers verwerkt zijn en er geen carry meer is.
+      const higherA=Math.floor(currentA/10**(place+1));
+      const higherB=Math.floor(currentB/10**(place+1));
+      if(place>=0 && higherA===0 && higherB===0 && carry===0) break;
+    }
+
+    return actions;
+  }
+
+  const actions=[];
+  let prevWork={};
+  let prevResult={};
+
+  steps.forEach((step,stepIndex)=>{
+    const nowWork=step.workDigits||{};
+    const nowResult=step.result||{};
+
+    const changedWork=Object.keys(nowWork)
+      .map(Number)
+      .filter(p=>!Object.prototype.hasOwnProperty.call(prevWork,p) || Number(prevWork[p])!==Number(nowWork[p]))
+      .sort((a,b)=>b-a)
+      .map(p=>({
+        kind:'work',
+        place:p,
+        expected:Number(nowWork[p]),
+        before:Object.prototype.hasOwnProperty.call(prevWork,p)
+          ? Number(prevWork[p])
+          : digitAtPlace(currentA,p)
+      }));
+
+    if(changedWork.length){
+      const rightmost=changedWork.reduce((m,t)=>Math.min(m,t.place),changedWork[0].place);
+      const leftmost=changedWork.reduce((m,t)=>Math.max(m,t.place),changedWork[0].place);
+      const left=changedWork.find(t=>t.place===leftmost);
+      const right=changedWork.find(t=>t.place===rightmost);
+
+      let message='Ik pas de werkcijfers aan.';
+      if(changedWork.length>=2 && left && right){
+        message='Ik leen 1 '+labels[left.place]+
+          '. De '+left.before+' bij '+labels[left.place]+' wordt '+left.expected+
+          ' en de '+right.before+' bij '+labels[right.place]+' wordt '+right.expected+'.';
+      }
+
+      actions.push({
+        targets:changedWork,
+        message,
+        stepIndex,
+        step,
+        kind:'work'
+      });
+    }
+
+    const changedResult=Object.keys(nowResult)
+      .map(Number)
+      .filter(p=>!Object.prototype.hasOwnProperty.call(prevResult,p) || Number(prevResult[p])!==Number(nowResult[p]))
+      .sort((a,b)=>a-b)
+      .map(p=>({kind:'result',place:p,expected:Number(nowResult[p])}));
+
+    for(const target of changedResult){
+      actions.push({
+        targets:[target],
+        message:'Ik schrijf '+target.expected+' bij '+labels[target.place]+'.',
+        stepIndex,
+        step,
+        kind:'result'
+      });
+    }
+
+    prevWork={...nowWork};
+    prevResult={...nowResult};
+  });
+
+  return actions;
+}
+
+function aDigitAtWorkPlace(place,workValues,original){
+  // Als deze hogere kolom nog niet eerder is verwerkt, start ik met het oorspronkelijke cijfer.
+  // Is hij al verwerkt, dan staat de actuele waarde al in workValues.
+  for(let p=0;p<place;p++){
+    // lagere plaatsen zijn al verwerkt; hogere niet
+  }
+  return digitAtPlace(original,place);
+}
+function supportMessageForStep(step, action=null){
+  if(!step) return action ? action.message : '';
+
+  const note=(step.workNote||'').trim();
+
+  if(operator==='-'){
+    // 1. Eerst herkennen waarom ik moet lenen.
+    const mCant=note.match(/(\d+)\s*−\s*(\d+)\s*kan niet/i);
+    if(mCant){
+      const place=Number.isInteger(step.place) ? step.place : 0;
+      return mCant[1]+' − '+mCant[2]+' kan niet. Ik heb meer '+placePlural(place)+' nodig.';
+    }
+
+    // 2. Daarna precies laten zien wat het lenen met beide cijfers doet.
+    if(action && action.kind==='work' && action.targets.length>=2){
+      return action.message;
+    }
+
+    // 3. Na het inwisselen benoemen wat ik nu beschikbaar heb.
+    const mNow=note.match(/Nu staat er\s+(\d+)\s+bij\s+([A-Z]+)/i);
+    if(mNow){
+      return 'Nu heb ik '+mNow[1]+' bij '+mNow[2]+'. Nu kan ik aftellen.';
+    }
+
+    // 4. Dan pas uitrekenen.
+    const mCalc=note.match(/(\d+)\s*−\s*(\d+)\s*=\s*(\d+)/);
+    if(mCalc){
+      return mCalc[1]+' − '+mCalc[2]+' = '+mCalc[3]+'. Ik schrijf '+mCalc[3]+' op.';
+    }
+
+    // Een losse inwisselstap alleen tonen als er geen concretere leenactie beschikbaar is.
+    const mExchange=note.match(/1\s+([A-Z]+)\s+wordt\s+10\s+([A-Z]+)/i);
+    if(mExchange){
+      return 'Ik wissel 1 '+mExchange[1]+' in voor 10 '+mExchange[2]+'.';
+    }
+  }
+
+  if(operator==='+'){
+    if(action && action.message) return action.message;
+    return note;
+  }
+
+  if(action && action.message) return action.message;
+  return note;
+}
+
+function isPracticeTargetCorrect(target){
+  if(!Object.prototype.hasOwnProperty.call(practiceEntries[target.kind],target.place)) return false;
+  return Number(practiceEntries[target.kind][target.place])===Number(target.expected);
+}
+
+function firstOpenPracticeAction(){
+  return practiceActions.find(action=>!action.targets.every(isPracticeTargetCorrect)) || null;
+}
+
+function practiceCellIndex(kind, place){
+  const visualIndex=5-Number(place); // HD..E
+  return kind==='work' ? 1+visualIndex : 29+visualIndex;
+}
+
+
+function syncPracticeBorrowStrikes(){
+  const firstCells=columnSumEl.querySelectorAll('[data-practice-first-place]');
+  firstCells.forEach(cell=>{
+    cell.classList.remove('borrow-replaced');
+
+    if(!practiceMode || operator!=='-') return;
+
+    const place=Number(cell.dataset.practiceFirstPlace);
+    const expected=practiceExpected.work[place];
+    const entered=practiceEntries.work[place];
+
+    if(expected===undefined || entered===undefined) return;
+
+    const validValues=Array.isArray(expected) ? expected.map(Number) : [Number(expected)];
+    if(validValues.includes(Number(entered))){
+      cell.classList.add('borrow-replaced');
+    }
+  });
+}
+
+function renderPracticeBoard(helpStep=null){
+  columnSumEl.innerHTML='';
+
+  const aDigits=digitsOf(currentA);
+  const bDigits=digitsOf(currentB);
+  const answer=operator==='+' ? currentA+currentB : currentA-currentB;
+  const answerDigits=digitsOf(Math.max(0,answer));
+  const active=helpStep && Number.isInteger(helpStep.place) ? 5-helpStep.place : -1;
+
+  const add=(text, cls='cell')=>{
+    const d=document.createElement('div');
+    d.className=cls;
+    d.textContent=text;
+    columnSumEl.appendChild(d);
+    return d;
+  };
+
+  const addInput=(cell,kind,place,expected)=>{
+    cell.textContent='';
+    cell.classList.add('practice-editable');
+
+    const input=document.createElement('input');
+    input.type='text';
+    input.inputMode='numeric';
+    input.pattern='[0-9]*';
+    input.autocomplete='off';
+    input.maxLength=2;
+    input.className='practice-input';
+    input.dataset.kind=kind;
+    input.dataset.place=String(place);
+    input.setAttribute('aria-label',(kind==='work'?'Werkcijfer':'Antwoordcijfer')+' bij '+labels[place]);
+
+    const validValues=(kind==='work' && Array.isArray(expected)) ? expected.map(Number) : [Number(expected)];
+    const saved=practiceEntries[kind][place];
+    if(saved!==undefined){
+      input.value=String(saved);
+      const savedCorrect=validValues.includes(Number(saved));
+      input.classList.toggle('practice-correct',savedCorrect);
+      input.classList.toggle('practice-wrong',!savedCorrect);
+    }
+
+    const clean=()=>input.value.replace(/[^0-9]/g,'');
+
+    const validateFinal=()=>{
+      const raw=clean();
+      input.value=raw;
+
+      if(raw===''){
+        delete practiceEntries[kind][place];
+        input.classList.remove('practice-correct','practice-wrong','practice-intermediate');
+        syncPracticeBorrowStrikes();
+        updatePracticeFeedback(helpStep);
+        return;
+      }
+
+      const entered=Number(raw);
+      practiceEntries[kind][place]=entered;
+      const correct=validValues.includes(entered);
+      const intermediate=kind==='work' && Array.isArray(expected) &&
+        correct && entered!==validValues[validValues.length-1];
+
+      input.classList.toggle('practice-correct',correct);
+      input.classList.toggle('practice-wrong',!correct);
+      input.classList.toggle('practice-intermediate',intermediate);
+      syncPracticeBorrowStrikes();
+      updatePracticeFeedback(helpStep);
+    };
+
+    input.addEventListener('input',()=>{
+      const raw=clean();
+      input.value=raw;
+
+      if(raw===''){
+        delete practiceEntries[kind][place];
+        input.classList.remove('practice-correct','practice-wrong','practice-intermediate');
+        syncPracticeBorrowStrikes();
+        updatePracticeFeedback(helpStep);
+        return;
+      }
+
+      const entered=Number(raw);
+      const exact=validValues.includes(entered);
+      const prefix=validValues.some(v=>String(v).startsWith(raw) && String(v)!==raw);
+
+      // Tijdens typen nooit rood kleuren. Een mogelijke eerste digit van 13 blijft dus neutraal.
+      input.classList.remove('practice-wrong');
+
+      if(exact){
+        practiceEntries[kind][place]=entered;
+        const intermediate=kind==='work' && Array.isArray(expected) &&
+          entered!==validValues[validValues.length-1];
+        input.classList.add('practice-correct');
+        input.classList.toggle('practice-intermediate',intermediate);
+        syncPracticeBorrowStrikes();
+        updatePracticeFeedback(helpStep);
+      }else{
+        delete practiceEntries[kind][place];
+        input.classList.remove('practice-correct','practice-intermediate');
+        syncPracticeBorrowStrikes();
+        if(prefix){
+          workNoteEl.textContent='Ik typ het werkgetal verder in.';
+        }
+      }
+    });
+
+    input.addEventListener('blur',validateFinal);
+    input.addEventListener('change',validateFinal);
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        e.preventDefault();
+        validateFinal();
+        input.blur();
+      }
+    });
+
+    cell.appendChild(input);
+  };
+
+  // Bovenste werkcijfers: alleen echte onthoud-/leenvakken.
+  add('','cell');
+  for(let i=0;i<6;i++){
+    const place=5-i;
+    const cell=add('', 'cell exchange '+(i===active?'activeplace':''));
+    if(Object.prototype.hasOwnProperty.call(practiceExpected.work,place)){
+      addInput(cell,'work',place,practiceExpected.work[place]);
+    }
+  }
+
+  // De twee vaste getallen.
+  add('','cell opcell');
+  aDigits.forEach((d,i)=>{
+    const place=5-i;
+    const cell=add(d,'cell '+(i===active?'activeplace':''));
+    cell.dataset.practiceFirstPlace=String(place);
+  });
+
+  add(operator==='+'?'+':'−','cell opcell');
+  bDigits.forEach((d,i)=>add(d,'cell '+(i===active?'activeplace':'')));
+
+  // Streep.
+  add('','cell');
+  for(let i=0;i<6;i++) add('','cell line');
+
+  // Antwoord: maak de invoervakken RECHTSTREEKS op basis van de uitkomst.
+  // Daardoor zijn ze altijd aanwezig, ook als de uitlegstappen anders zijn opgebouwd.
+  add('','cell');
+  const firstAnswerIndex=answerDigits.findIndex(d=>d!=='');
+  for(let i=0;i<6;i++){
+    const place=5-i;
+    const cell=add('', 'cell resultcell '+(i===active?'activeplace':''));
+    if(i>=firstAnswerIndex){
+      const expected=Math.floor(Math.max(0,answer)/10**place)%10;
+      practiceExpected.result[place]=expected;
+      addInput(cell,'result',place,expected);
+    }
+  }
+
+  syncPracticeBorrowStrikes();
+  updatePracticeFeedback(helpStep);
+}
+
+
+function isPracticeCompletelyCorrect(){
+  // Alle uiteindelijke werkcijfers moeten ingevuld zijn en op hun laatste geldige stand staan.
+  for(const [place,expected] of Object.entries(practiceExpected.work)){
+    if(!Object.prototype.hasOwnProperty.call(practiceEntries.work,place)) return false;
+    const valid=Array.isArray(expected) ? expected.map(Number) : [Number(expected)];
+    const finalExpected=valid[valid.length-1];
+    if(Number(practiceEntries.work[place])!==finalExpected) return false;
+  }
+
+  // Alle antwoordcijfers onder de streep moeten ingevuld en correct zijn.
+  for(const [place,expected] of Object.entries(practiceExpected.result)){
+    if(!Object.prototype.hasOwnProperty.call(practiceEntries.result,place)) return false;
+    if(Number(practiceEntries.result[place])!==Number(expected)) return false;
+  }
+
+  return Object.keys(practiceExpected.result).length>0;
+}
+
+function updatePracticeFeedback(helpStep=null){
+  workNoteEl.classList.remove('practice-success');
+
+  // Eerst alleen echte, afgeronde invoer als fout behandelen.
+  const wrong=[];
+
+  for(const [place,expected] of Object.entries(practiceExpected.work)){
+    if(!Object.prototype.hasOwnProperty.call(practiceEntries.work,place)) continue;
+    const valid=Array.isArray(expected) ? expected.map(Number) : [Number(expected)];
+    const value=Number(practiceEntries.work[place]);
+    if(!valid.includes(value)) wrong.push({kind:'work',place:Number(place)});
+  }
+
+  for(const [place,expected] of Object.entries(practiceExpected.result)){
+    if(!Object.prototype.hasOwnProperty.call(practiceEntries.result,place)) continue;
+    if(Number(practiceEntries.result[place])!==Number(expected)){
+      wrong.push({kind:'result',place:Number(place)});
+    }
+  }
+
+  if(isPracticeCompletelyCorrect()){
+    workNoteEl.textContent='✓ Mijn som klopt helemaal!';
+    workNoteEl.classList.add('practice-success');
+    nextBtn.disabled=true;
+    practiceHelpVisible=false;
+    return;
+  }
+
+  // In Zelf oefenen blijft de blauwe uitleg stil zolang de leerling geen hulp vraagt.
+  if(!practiceHelpVisible){
+    workNoteEl.textContent='';
+    return;
+  }
+
+  if(wrong.length){
+    const t=wrong[0];
+    workNoteEl.textContent='Ik kijk nog eens naar '+labels[t.place]+'.';
+    return;
+  }
+
+  const open=firstOpenPracticeAction();
+
+  if(!open){
+    workNoteEl.textContent='';
+    return;
+  }
+
+  if(helpStep){
+    workNoteEl.textContent=supportMessageForStep(helpStep,open);
+    return;
+  }
+
+  workNoteEl.textContent=open.message;
+}
+function preparePracticeFromInputs(){
+  if(!practiceMode) return;
+
+  if(el('first').value.trim()==='' || el('second').value.trim()===''){
+    renderColumnSum();
+    workNoteEl.textContent='Vul eerst beide getallen bovenaan in.';
+    return;
+  }
+
+  const a=parseInput(el('first')), b=parseInput(el('second'));
+  currentA=a; currentB=b;
+
+  if(operator==='-' && b>a){
+    renderColumnSum();
+    workNoteEl.textContent='Bij aftellen moet het tweede getal kleiner of gelijk zijn aan het eerste.';
+    return;
+  }
+
+  steps=buildSteps(a,b);
+  practiceExpected=buildPracticeExpected();
+  practiceExpected.result={};
+  practiceActions=buildPracticeActions();
+  practiceHelpIndex=-1;
+  practiceHelpVisible=false;
+
+  setFromNumber(a);
+  render();
+
+  // Start met de kale som. De uitleg wordt pas zichtbaar als de leerling om hulp vraagt.
+  renderPracticeBoard(null);
+
+  backBtn.disabled=true;
+  nextBtn.disabled=practiceActions.length===0;
+  nextBtn.textContent='Stap vooruit →';
+  backBtn.textContent='← Stap terug';
+}
+
+function showPracticeHelp(i){
+  if(!practiceMode || !practiceActions.length) return;
+
+  practiceHelpVisible=true;
+  practiceHelpIndex=Math.max(0,Math.min(i,practiceActions.length-1));
+  const action=practiceActions[practiceHelpIndex];
+  const step=action.step || steps[action.stepIndex] || null;
+
+  // De hulp doet precies deze ene handeling voor.
+  action.targets.forEach(target=>{
+    practiceEntries[target.kind][target.place]=Number(target.expected);
+  });
+
+  // Laat links exact de bijbehorende leen-/rekenstand zien.
+  if(step){
+    if(step.values) values=[...step.values];
+    else if(step.value!==undefined) setFromNumber(step.value);
+  }
+  render();
+
+  // Rechts blijven eigen antwoorden staan; alleen deze hulpstap wordt ingevuld.
+  renderPracticeBoard(step);
+
+  // Korte denkstem: waarom doe ik dit, of wat reken ik nu uit?
+  workNoteEl.textContent=supportMessageForStep(step,action);
+
+  backBtn.disabled=practiceHelpIndex<=0;
+  nextBtn.disabled=practiceHelpIndex>=practiceActions.length-1;
+}
+
 function showStep(i){
   if(!steps.length)return;
   stepIndex=Math.max(0,Math.min(i,steps.length-1));
@@ -519,13 +1327,15 @@ function showStep(i){
   if(step.values) values=[...step.values]; else setFromNumber(step.value);
   backBtn.disabled=stepIndex<=0;
   nextBtn.disabled=stepIndex>=steps.length-1;
+  backBtn.textContent='← Stap terug';
+  nextBtn.textContent='Volgende stap →';
   render();
   renderColumnSum(step);
 }
 
-el('plus').addEventListener('click',()=>{operator='+';el('opview').textContent='+';updateEstimate();renderColumnSum(steps[stepIndex]||null);});
-el('minus').addEventListener('click',()=>{operator='-';el('opview').textContent='−';updateEstimate();renderColumnSum(steps[stepIndex]||null);});
-el('reset').addEventListener('click',()=>{values=[0,0,0,0,0,0];steps=[];stepIndex=-1;currentA=0;currentB=0;render();renderColumnSum();});
+el('plus').addEventListener('click',()=>{operator='+';el('opview').textContent='+';updateEstimate();if(practiceMode)preparePracticeFromInputs();else renderColumnSum(steps[stepIndex]||null);});
+el('minus').addEventListener('click',()=>{operator='-';el('opview').textContent='−';updateEstimate();if(practiceMode)preparePracticeFromInputs();else renderColumnSum(steps[stepIndex]||null);});
+el('reset').addEventListener('click',()=>{practiceEntries={work:{},result:{}};practiceExpected={work:{},result:{}};practiceActions=[];practiceHelpIndex=-1;practiceHelpVisible=false;values=[0,0,0,0,0,0];steps=[];stepIndex=-1;currentA=0;currentB=0;render();renderColumnSum();backBtn.textContent='← Stap terug';nextBtn.textContent='Volgende stap →';workNoteEl.textContent=practiceMode?'Zelf oefenen staat aan. Vul een som in.':'Vul een som in en klik op Leg uit.';});
 function randomInt(min,max){
   min=Math.ceil(min); max=Math.floor(max);
   return Math.floor(Math.random()*(max-min+1))+min;
@@ -566,22 +1376,104 @@ function makeRandomSum(){
   estimateFeedbackEl.textContent='';
 }
 
-el('random').addEventListener('click',makeRandomSum);
+el('random').addEventListener('click',()=>{
+  makeRandomSum();
+
+  // In Zelf oefenen moet een nieuwe willekeurige som meteen
+  // opnieuw de interactieve rechterkant opbouwen.
+  if(practiceMode){
+    practiceEntries={work:{},result:{}};
+    practiceExpected={work:{},result:{}};
+    practiceActions=[];
+    practiceHelpIndex=-1;
+    preparePracticeFromInputs();
+  }
+});
+
+el('practiceToggle').addEventListener('click',()=>{
+  practiceMode=!practiceMode;
+  const btn=el('practiceToggle');
+  btn.textContent=practiceMode ? 'Modus: Zelf oefenen' : 'Modus: Uitleg';
+  btn.classList.toggle('practice-on',practiceMode);
+  btn.setAttribute('aria-pressed',String(practiceMode));
+  document.querySelector('.vertical-work')?.classList.toggle('practice-mode',practiceMode);
+
+  practiceEntries={work:{},result:{}};
+  practiceExpected={work:{},result:{}};
+  practiceActions=[];
+  practiceHelpIndex=-1;
+  practiceHelpVisible=false;
+
+  if(practiceMode){
+    preparePracticeFromInputs();
+  }else{
+    backBtn.textContent='← Stap terug';
+    nextBtn.textContent='Volgende stap →';
+    if(steps.length){
+      stepIndex=0;
+      showStep(0);
+    }else{
+      renderColumnSum();
+      workNoteEl.textContent='Vul een som in en klik op Leg uit.';
+    }
+  }
+});
 
 el('sumform').addEventListener('submit',e=>{
   e.preventDefault();
   const a=parseInput(el('first')), b=parseInput(el('second'));
   currentA=a; currentB=b;
-  if(operator==='-'&&b>a){workNoteEl.textContent='Bij aftellen moet het tweede getal kleiner of gelijk zijn aan het eerste.';return;}
+  practiceEntries={work:{},result:{}};
+
+  if(operator==='-'&&b>a){
+    workNoteEl.textContent='Bij aftellen moet het tweede getal kleiner of gelijk zijn aan het eerste.';
+    return;
+  }
+
   steps=buildSteps(a,b);
-  showStep(0);
+
+  if(practiceMode){
+    practiceExpected=buildPracticeExpected();
+    practiceActions=buildPracticeActions();
+    practiceExpected.result={};
+    practiceHelpIndex=-1;
+    practiceHelpVisible=false;
+    setFromNumber(a);
+    render();
+    renderPracticeBoard(null);
+    backBtn.disabled=true;
+    nextBtn.disabled=steps.length<=1;
+    nextBtn.textContent='Stap vooruit →';
+  }else{
+    showStep(0);
+  }
 });
 
-backBtn.addEventListener('click',()=>{if(stepIndex>0)showStep(stepIndex-1);});
-nextBtn.addEventListener('click',()=>{if(stepIndex<steps.length-1)showStep(stepIndex+1);});
+backBtn.addEventListener('click',()=>{if(practiceMode){if(practiceHelpIndex>0)showPracticeHelp(practiceHelpIndex-1);}else if(stepIndex>0)showStep(stepIndex-1);});
+nextBtn.addEventListener('click',()=>{
+  if(practiceMode){
+    if(!practiceActions.length) return;
 
-el('first').addEventListener('input',updateEstimate);
-el('second').addEventListener('input',updateEstimate);
+    // Zoek vanaf de huidige positie de volgende stap die nog niet goed is ingevuld.
+    let nextIndex=Math.max(0,practiceHelpIndex+1);
+    while(nextIndex<practiceActions.length &&
+          practiceActions[nextIndex].targets.every(isPracticeTargetCorrect)){
+      nextIndex++;
+    }
+
+    // Als alles na de huidige positie al goed is, mag de hulp de eerstvolgende
+    // demonstratiestap tonen; anders blijft de knop niet 'steken'.
+    if(nextIndex>=practiceActions.length){
+      nextIndex=Math.min(practiceHelpIndex+1,practiceActions.length-1);
+    }
+    showPracticeHelp(nextIndex);
+  }else if(stepIndex<steps.length-1){
+    showStep(stepIndex+1);
+  }
+});
+
+el('first').addEventListener('input',()=>{updateEstimate(); if(practiceMode){practiceEntries={work:{},result:{}};preparePracticeFromInputs();}});
+el('second').addEventListener('input',()=>{updateEstimate(); if(practiceMode){practiceEntries={work:{},result:{}};preparePracticeFromInputs();}});
 estimateCheckBtn.addEventListener('click',()=>{
   if(estimateResult===null){estimateFeedbackEl.textContent='Vul eerst beide getallen in.';return;}
   const entered=Number(String(estimateAnswerEl.value).replace(/\./g,'').replace(/[^0-9-]/g,''));
