@@ -460,6 +460,12 @@ let practiceExpected={work:{},result:{}};
 let practiceActions=[];
 let practiceHelpIndex=-1;
 let practiceHelpVisible=false;
+let practiceHelpSnapshots=[];
+let practiceHistory=[];
+let practiceHistoryPos=-1;
+let practiceRestoringHistory=false;
+let practiceTimeline=[];
+let practiceTimelinePos=0;
 
 function roundForEstimate(n){
   if(n<10) return n;
@@ -1199,7 +1205,66 @@ function isPracticeCompletelyCorrect(){
   return Object.keys(practiceExpected.result).length>0;
 }
 
+
+function buildCompletedPracticeHistory(){
+  // Bouw een volledige terugkijktijdlijn, ook wanneer de leerling
+  // de hele som zelf heeft ingevuld zonder eerder Stap vooruit te gebruiken.
+  const history=[];
+
+  let entries={work:{},result:{}};
+  let stateValues=[0,0,0,0,0,0];
+  for(let p=0;p<6;p++) stateValues[p]=digitAtPlace(currentA,p);
+
+  history.push({
+    entries:{work:{},result:{}},
+    values:[...stateValues],
+    helpIndex:-1,
+    helpVisible:false,
+    note:''
+  });
+
+  practiceActions.forEach((action,index)=>{
+    action.targets.forEach(target=>{
+      entries[target.kind][target.place]=Number(target.expected);
+    });
+
+    const step=action.step || steps[action.stepIndex] || null;
+    if(step){
+      if(step.values){
+        stateValues=[...step.values];
+      }else if(step.value!==undefined){
+        stateValues=[0,0,0,0,0,0];
+        const n=Math.max(0,Math.min(999999,Math.floor(step.value)));
+        for(let p=0;p<6;p++) stateValues[p]=Math.floor(n/10**p)%10;
+      }
+    }
+
+    history.push({
+      entries:{
+        work:{...entries.work},
+        result:{...entries.result}
+      },
+      values:[...stateValues],
+      helpIndex:index,
+      helpVisible:true,
+      note:supportMessageForStep(step,action)
+    });
+  });
+
+  // De laatste toestand is de voltooide som.
+  if(history.length){
+    history[history.length-1].note='✓ Mijn som klopt helemaal!';
+    history[history.length-1].helpVisible=false;
+  }
+
+  practiceHistory=history;
+  practiceHistoryPos=history.length-1;
+  practiceHelpIndex=practiceActions.length-1;
+}
+
 function updatePracticeFeedback(helpStep=null){
+  if(practiceRestoringHistory) return;
+
   workNoteEl.classList.remove('practice-success');
 
   // Eerst alleen echte, afgeronde invoer als fout behandelen.
@@ -1222,8 +1287,15 @@ function updatePracticeFeedback(helpStep=null){
   if(isPracticeCompletelyCorrect()){
     workNoteEl.textContent='✓ Mijn som klopt helemaal!';
     workNoteEl.classList.add('practice-success');
-    nextBtn.disabled=true;
     practiceHelpVisible=false;
+
+    // De uitleg-tijdlijn bestaat los van de invoer. Na afronden zet ik de
+    // positie op het einde, zodat Stap terug meteen door alle rekenstappen loopt.
+    if(!practiceTimeline.length) buildPracticeTimeline();
+    practiceTimelinePos=practiceTimeline.length-1;
+
+    backBtn.disabled=practiceTimelinePos<=0;
+    nextBtn.disabled=true;
     return;
   }
 
@@ -1275,8 +1347,12 @@ function preparePracticeFromInputs(){
   practiceExpected=buildPracticeExpected();
   practiceExpected.result={};
   practiceActions=buildPracticeActions();
+  buildPracticeTimeline();
   practiceHelpIndex=-1;
   practiceHelpVisible=false;
+  practiceHelpSnapshots=[];
+  resetPracticeHistory();
+  practiceTimeline=[]; practiceTimelinePos=0;
 
   setFromNumber(a);
   render();
@@ -1290,33 +1366,204 @@ function preparePracticeFromInputs(){
   backBtn.textContent='← Stap terug';
 }
 
+
+
+function buildPracticeTimeline(){
+  const timeline=[];
+
+  let entries={work:{},result:{}};
+  let stateValues=[0,0,0,0,0,0];
+  for(let p=0;p<6;p++) stateValues[p]=digitAtPlace(currentA,p);
+
+  // Stap 0 = helemaal kale som.
+  timeline.push({
+    entries:{work:{},result:{}},
+    values:[...stateValues],
+    helpIndex:-1,
+    helpVisible:false,
+    note:''
+  });
+
+  practiceActions.forEach((action,index)=>{
+    action.targets.forEach(target=>{
+      entries[target.kind][target.place]=Number(target.expected);
+    });
+
+    const step=action.step || steps[action.stepIndex] || null;
+    if(step){
+      if(step.values){
+        stateValues=[...step.values];
+      }else if(step.value!==undefined){
+        stateValues=[0,0,0,0,0,0];
+        const n=Math.max(0,Math.min(999999,Math.floor(step.value)));
+        for(let p=0;p<6;p++) stateValues[p]=Math.floor(n/10**p)%10;
+      }
+    }
+
+    timeline.push({
+      entries:{
+        work:{...entries.work},
+        result:{...entries.result}
+      },
+      values:[...stateValues],
+      helpIndex:index,
+      helpVisible:true,
+      note:supportMessageForStep(step,action)
+    });
+  });
+
+  practiceTimeline=timeline;
+  practiceTimelinePos=0;
+}
+
+function renderPracticeTimelinePosition(pos){
+  if(!practiceTimeline.length) buildPracticeTimeline();
+  practiceTimelinePos=Math.max(0,Math.min(pos,practiceTimeline.length-1));
+  const state=practiceTimeline[practiceTimelinePos];
+
+  practiceEntries={
+    work:{...state.entries.work},
+    result:{...state.entries.result}
+  };
+  values=[...state.values];
+  practiceHelpIndex=state.helpIndex;
+  practiceHelpVisible=state.helpVisible;
+
+  render();
+
+  let step=null;
+  if(practiceHelpIndex>=0 && practiceActions[practiceHelpIndex]){
+    const action=practiceActions[practiceHelpIndex];
+    step=action.step || steps[action.stepIndex] || null;
+  }
+
+  practiceRestoringHistory=true;
+  renderPracticeBoard(step);
+  practiceRestoringHistory=false;
+
+  workNoteEl.textContent=state.note;
+  workNoteEl.classList.remove('practice-success');
+
+  backBtn.disabled=practiceTimelinePos<=0;
+  nextBtn.disabled=practiceTimelinePos>=practiceTimeline.length-1;
+}
+
+function clonePracticeEntries(){
+  return {
+    work:{...practiceEntries.work},
+    result:{...practiceEntries.result}
+  };
+}
+
+function capturePracticeState(){
+  return {
+    entries:clonePracticeEntries(),
+    values:[...values],
+    helpIndex:practiceHelpIndex,
+    helpVisible:practiceHelpVisible,
+    note:workNoteEl.textContent || ''
+  };
+}
+
+function restorePracticeState(state){
+  if(!state) return;
+
+  practiceEntries={
+    work:{...state.entries.work},
+    result:{...state.entries.result}
+  };
+  values=[...state.values];
+  practiceHelpIndex=state.helpIndex;
+  practiceHelpVisible=state.helpVisible;
+
+  render();
+
+  let step=null;
+  if(practiceHelpIndex>=0 && practiceActions[practiceHelpIndex]){
+    const action=practiceActions[practiceHelpIndex];
+    step=action.step || steps[action.stepIndex] || null;
+  }
+
+  // De rechterkant wordt uitsluitend uit de opgeslagen invoertoestand opgebouwd.
+  // Tijdens herstellen mag updatePracticeFeedback de tijdlijn NIET opnieuw opbouwen.
+  practiceRestoringHistory=true;
+  renderPracticeBoard(step);
+  practiceRestoringHistory=false;
+
+  workNoteEl.textContent=state.note;
+  workNoteEl.classList.toggle('practice-success',state.note==='✓ Mijn som klopt helemaal!');
+
+  backBtn.disabled=practiceHistoryPos<=0;
+  nextBtn.disabled=practiceHistoryPos>=practiceHistory.length-1 && 
+    (practiceHelpIndex>=practiceActions.length-1 || practiceActions.length===0);
+}
+
+function resetPracticeHistory(){
+  practiceHistory=[];
+  practiceHistoryPos=-1;
+}
+
+function ensurePracticeHistoryBaseline(){
+  if(practiceHistoryPos>=0) return;
+  practiceHistory=[capturePracticeState()];
+  practiceHistoryPos=0;
+}
+
+function stepPracticeHistoryBack(){
+  if(practiceHistoryPos<=0) return;
+  practiceHistoryPos--;
+  restorePracticeState(practiceHistory[practiceHistoryPos]);
+}
+
+function stepPracticeHistoryForward(){
+  if(practiceHistoryPos<0 || practiceHistoryPos>=practiceHistory.length-1) return false;
+  practiceHistoryPos++;
+  restorePracticeState(practiceHistory[practiceHistoryPos]);
+  return true;
+}
+
+
+
 function showPracticeHelp(i){
   if(!practiceMode || !practiceActions.length) return;
 
+  ensurePracticeHistoryBaseline();
+
+  // Als ik eerst terug ben gegaan en daarna weer vooruit ga,
+  // vervallen de oude toekomstige toestanden.
+  if(practiceHistoryPos < practiceHistory.length-1){
+    practiceHistory=practiceHistory.slice(0,practiceHistoryPos+1);
+  }
+
   practiceHelpVisible=true;
   practiceHelpIndex=Math.max(0,Math.min(i,practiceActions.length-1));
+
   const action=practiceActions[practiceHelpIndex];
   const step=action.step || steps[action.stepIndex] || null;
 
-  // De hulp doet precies deze ene handeling voor.
+  // Deze ene stap wordt voorgedaan.
   action.targets.forEach(target=>{
     practiceEntries[target.kind][target.place]=Number(target.expected);
   });
 
-  // Laat links exact de bijbehorende leen-/rekenstand zien.
+  // Telraam exact naar de toestand van deze stap.
   if(step){
     if(step.values) values=[...step.values];
     else if(step.value!==undefined) setFromNumber(step.value);
   }
   render();
 
-  // Rechts blijven eigen antwoorden staan; alleen deze hulpstap wordt ingevuld.
+  // Rechterkant volledig opnieuw opbouwen.
   renderPracticeBoard(step);
 
-  // Korte denkstem: waarom doe ik dit, of wat reken ik nu uit?
+  // Tekst hoort ook bij deze toestand.
   workNoteEl.textContent=supportMessageForStep(step,action);
 
-  backBtn.disabled=practiceHelpIndex<=0;
+  // Sla daarna de COMPLETE toestand op.
+  practiceHistory.push(capturePracticeState());
+  practiceHistoryPos=practiceHistory.length-1;
+
+  backBtn.disabled=practiceHistoryPos<=0;
   nextBtn.disabled=practiceHelpIndex>=practiceActions.length-1;
 }
 
@@ -1335,7 +1582,7 @@ function showStep(i){
 
 el('plus').addEventListener('click',()=>{operator='+';el('opview').textContent='+';updateEstimate();if(practiceMode)preparePracticeFromInputs();else renderColumnSum(steps[stepIndex]||null);});
 el('minus').addEventListener('click',()=>{operator='-';el('opview').textContent='−';updateEstimate();if(practiceMode)preparePracticeFromInputs();else renderColumnSum(steps[stepIndex]||null);});
-el('reset').addEventListener('click',()=>{practiceEntries={work:{},result:{}};practiceExpected={work:{},result:{}};practiceActions=[];practiceHelpIndex=-1;practiceHelpVisible=false;values=[0,0,0,0,0,0];steps=[];stepIndex=-1;currentA=0;currentB=0;render();renderColumnSum();backBtn.textContent='← Stap terug';nextBtn.textContent='Volgende stap →';workNoteEl.textContent=practiceMode?'Zelf oefenen staat aan. Vul een som in.':'Vul een som in en klik op Leg uit.';});
+el('reset').addEventListener('click',()=>{practiceEntries={work:{},result:{}};practiceExpected={work:{},result:{}};practiceActions=[];practiceHelpIndex=-1;practiceHelpVisible=false;practiceHelpSnapshots=[];practiceHelpSnapshots=[];resetPracticeHistory();practiceTimeline=[];practiceTimelinePos=0;values=[0,0,0,0,0,0];steps=[];stepIndex=-1;currentA=0;currentB=0;render();renderColumnSum();backBtn.textContent='← Stap terug';nextBtn.textContent='Volgende stap →';workNoteEl.textContent=practiceMode?'Zelf oefenen staat aan. Vul een som in.':'Vul een som in en klik op Leg uit.';});
 function randomInt(min,max){
   min=Math.ceil(min); max=Math.floor(max);
   return Math.floor(Math.random()*(max-min+1))+min;
@@ -1403,6 +1650,9 @@ el('practiceToggle').addEventListener('click',()=>{
   practiceActions=[];
   practiceHelpIndex=-1;
   practiceHelpVisible=false;
+  practiceHelpSnapshots=[];
+  resetPracticeHistory();
+  practiceTimeline=[]; practiceTimelinePos=0;
 
   if(practiceMode){
     preparePracticeFromInputs();
@@ -1435,9 +1685,13 @@ el('sumform').addEventListener('submit',e=>{
   if(practiceMode){
     practiceExpected=buildPracticeExpected();
     practiceActions=buildPracticeActions();
+    buildPracticeTimeline();
     practiceExpected.result={};
     practiceHelpIndex=-1;
     practiceHelpVisible=false;
+    practiceHelpSnapshots=[];
+    resetPracticeHistory();
+    practiceTimeline=[]; practiceTimelinePos=0;
     setFromNumber(a);
     render();
     renderPracticeBoard(null);
@@ -1449,24 +1703,31 @@ el('sumform').addEventListener('submit',e=>{
   }
 });
 
-backBtn.addEventListener('click',()=>{if(practiceMode){if(practiceHelpIndex>0)showPracticeHelp(practiceHelpIndex-1);}else if(stepIndex>0)showStep(stepIndex-1);});
+backBtn.addEventListener('click',()=>{
+  if(practiceMode){
+    if(!practiceTimeline.length) buildPracticeTimeline();
+    if(practiceTimelinePos>0){
+      renderPracticeTimelinePosition(practiceTimelinePos-1);
+    }
+  }else if(stepIndex>0){
+    showStep(stepIndex-1);
+  }
+});
 nextBtn.addEventListener('click',()=>{
   if(practiceMode){
     if(!practiceActions.length) return;
 
-    // Zoek vanaf de huidige positie de volgende stap die nog niet goed is ingevuld.
-    let nextIndex=Math.max(0,practiceHelpIndex+1);
-    while(nextIndex<practiceActions.length &&
-          practiceActions[nextIndex].targets.every(isPracticeTargetCorrect)){
-      nextIndex++;
+    if(!practiceTimeline.length){
+      buildPracticeTimeline();
+
+      // Als de leerling al zelf dingen heeft ingevuld, begin bij de eerste
+      // uitlegstap. Vanaf dat moment is vooruit/terug een zuivere reken-tijdlijn.
+      practiceTimelinePos=0;
     }
 
-    // Als alles na de huidige positie al goed is, mag de hulp de eerstvolgende
-    // demonstratiestap tonen; anders blijft de knop niet 'steken'.
-    if(nextIndex>=practiceActions.length){
-      nextIndex=Math.min(practiceHelpIndex+1,practiceActions.length-1);
+    if(practiceTimelinePos<practiceTimeline.length-1){
+      renderPracticeTimelinePosition(practiceTimelinePos+1);
     }
-    showPracticeHelp(nextIndex);
   }else if(stepIndex<steps.length-1){
     showStep(stepIndex+1);
   }
