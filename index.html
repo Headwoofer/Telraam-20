@@ -263,7 +263,7 @@ function render(){
       const b=document.createElement('button');
       b.type='button'; b.className='bead inactive';
       b.style.background=n<10?colors[col][0]:colors[col][1];
-      b.addEventListener('click',()=>{values[5-col]=n+1;steps=[];stepIndex=-1;render();});
+      b.addEventListener('click',()=>{values[5-col]=n+1;render();});
       top.appendChild(b);
     }
 
@@ -273,7 +273,7 @@ function render(){
       const b=document.createElement('button');
       b.type='button'; b.className='bead active';
       b.style.background=n<10?colors[col][0]:colors[col][1];
-      b.addEventListener('click',()=>{values[5-col]=n;steps=[];stepIndex=-1;render();});
+      b.addEventListener('click',()=>{values[5-col]=n;render();});
       bottom.appendChild(b);
     }
     rod.append(top,spacer,bottom);
