@@ -51,6 +51,7 @@ button{cursor:pointer;font-size:20px;font-weight:800}
 .column-sum .resultcell{background:#eef2ff;color:#111827}
 .column-sum .activeplace{outline:5px solid #2563eb;outline-offset:-3px;background:#dbeafe}
 .column-sum .changed{background:#fef3c7}
+.column-sum .borrow-replaced{text-decoration-line:line-through;text-decoration-thickness:4px;text-decoration-color:#9a3412;text-decoration-skip-ink:none}
 .work-note{margin-top:22px;text-align:center;font-size:30px;font-weight:900;color:#2563eb;min-height:82px;line-height:1.35}
  .main-stage{display:grid;grid-template-columns:minmax(720px,1.55fr) minmax(430px,.85fr);gap:22px;align-items:stretch}
 .place-row{display:grid;grid-template-columns:52px repeat(6,minmax(48px,1fr));gap:5px;width:100%;max-width:570px;margin:0 auto 4px;font-size:17px;font-weight:900;color:#475569;text-align:center}
@@ -261,7 +262,15 @@ function renderColumnSum(step=null){
         }
         // Met een werkcijfer rekenen we bovenste werkcijfer − onderste cijfer.
       }
-      add(d, 'cell '+(shouldHighlight?'activeplace ':'')+(kind==='b'&&i===active?'changed':''));
+      // Bij aftellen blijft het oorspronkelijke cijfer zichtbaar, maar zodra het door
+      // lenen/inwisselen is vervangen, strepen we het door. Zo is duidelijk dat de
+      // actuele waarde voortaan in het bovenste werkvak staat.
+      const place=5-i;
+      const isBorrowReplaced = operator==='-' && kind==='a' &&
+        Object.prototype.hasOwnProperty.call(workDigits,place) && d!=='';
+      add(d, 'cell '+(shouldHighlight?'activeplace ':'')+
+        (kind==='b'&&i===active?'changed ':'')+
+        (isBorrowReplaced?'borrow-replaced':''));
     });
   };
 
